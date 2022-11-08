@@ -112,8 +112,6 @@ function MasterTradeSkills_Initialize()
 		-- Register the addon in myAddOns
 		myAddOnsFrame_Register(MasterTradeSkillsDetails, MasterTradeSkillsHelp);
 	end
--- Display a message in the ChatFrame indicating a successful load of the addon
-	MasterTradeSkills_Write(MTS_LOADED);
 	
 	SLASH_MasterTradeSkills1 = "/MasterTradeSkills";
 	SLASH_MasterTradeSkills2 = "/mts"; 
@@ -151,9 +149,9 @@ function MasterTradeSkills_Initialize()
 			ReagentData_LoadTailoring();
 		end
 	end
-	
+
+	-- Display a message in the ChatFrame indicating a successful load of the addon
 	MasterTradeSkills_Write(MTS_LOADED);
-	
 end
 
 function MasterTradeSkills_InitData()
