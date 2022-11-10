@@ -15,6 +15,10 @@ It will save everything between sessions per character
 Adjustable options. Show what skills you want to see. Show only learned or not learned recipes.
 Master Trade Skills uses the database from ReagentData (wich is included in the package.) ReagentData is a comprehensive library of all reagents used in tradeskills in World of Warcraft.
 
+# Screenshots
+![image](https://user-images.githubusercontent.com/55476/201141874-13224580-1b57-4ff0-b0c6-a06d16b7b660.png)
+![image](https://user-images.githubusercontent.com/55476/201142016-4d313b42-0f62-44a5-960b-c0fd049a31bf.png)
+
 # Usage
 To use Master Trade Skills, just install the addon in your interface directory. To let the addon know what recipes you know you have to open all your tradeskill windows first (tailoring, first aid, etc.) Next time you hover over a ingredient you will see the recipes in the tooltip.
 
