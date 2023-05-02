@@ -909,6 +909,9 @@ function MTS_SetItemRef(arg1,arg2,arg3)
 	if (IRR_ItemTypes) then
 		return MTS_Original_SetItemRef(arg1,arg2,arg3);
 	end
+	if (arg2 ~= "item") then
+		return MTS_Original_SetItemRef(arg1, arg2, arg3);
+	end
 
 	ShowUIPanel(ItemRefTooltip);
 	if ( not ItemRefTooltip:IsVisible() ) then
