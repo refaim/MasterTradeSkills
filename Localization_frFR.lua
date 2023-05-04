@@ -1323,3 +1323,4 @@ MTS_RECIPENAME = {
     ["Wound Poison IV"] = "Poison douloureux IV",
     ["Wound Poison"] = "Poison douloureux",
 };
+end
