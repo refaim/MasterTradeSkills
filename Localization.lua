@@ -4,79 +4,78 @@ MTS_VERSION = "1.12";
 MTS_RELEASE = "August 24, 2006";
 MTS_TITLE = MTS_NAME .. " - v" .. MTS_VERSION;
 MTS_DATA_VERSION = "1";
-BINDING_HEADER_MTS_SEP	= "Master Trade Skills";
+BINDING_HEADER_MTS_SEP    = "Master Trade Skills";
 
--- non Localised vales 
-	MTS_TRADESKILLS_NAME = {
-		[1] = "cooking";
-		[2] = "tailoring";
-		[3] = "enchanting";
-		[4] = "leatherworking";
-		[5] = "blacksmithing";
-		[6] = "alchemy";
-		[7] = "engineering";
-		[8] = "firstaid";
-		[9] = "mining";
-		[10] = "poisons";
-	};
+-- non Localised vales
+MTS_TRADESKILLS_NAME = {
+    [1] = "cooking";
+    [2] = "tailoring";
+    [3] = "enchanting";
+    [4] = "leatherworking";
+    [5] = "blacksmithing";
+    [6] = "alchemy";
+    [7] = "engineering";
+    [8] = "firstaid";
+    [9] = "mining";
+    [10] = "poisons";
+};
 
 
 -- Messages That Are Localized Below Here
+MTS_LOADED = "Master Trade Skills v".. MTS_VERSION .. " AddOn loaded";
+MTS_HELP = {
+    [1] = "|cFFFF0000MasterTradeSkills commands:|r";
+    [2] = "/MTS On : Turn MasterTradeSkills on";
+    [3] = "/MTS Off : Turn MasterTradeSkills on";
+    [4] = "/MTS Toggle : Toggle between on and off";
+    [5] = "/MTS Options : Show the options dialog";
+    [6] = "/MTS Show : Shows All Recipes Without Any Filters";
+};
+MTS_WRONGSLASH = "For help type \"/MasterTradeSkills help\"";
+MTS_ENABLED = "MasterTradeSkills is enabled";
+MTS_DISABLED = "MasterTradeSkills is disabled";
+BINDING_NAME_MTS_TEXT    = "Configure Options";
+BINDING_NAME_MTS_SHOW    = "Show Recipe List";
 
-	MTS_LOADED = "Master Trade Skills v".. MTS_VERSION .. " AddOn loaded";
-	MTS_HELP = {
-		[1] = "|cFFFF0000MasterTradeSkills commands:|r";
-		[2] = "/MTS On : Turn MasterTradeSkills on";
-		[3] = "/MTS Off : Turn MasterTradeSkills on";
-		[4] = "/MTS Toggle : Toggle between on and off";
-		[5] = "/MTS Options : Show the options dialog";
-		[6] = "/MTS Show : Shows All Recipes Without Any Filters";
-	};
-	MTS_WRONGSLASH = "For help type \"/MasterTradeSkills help\"";
-	MTS_ENABLED = "MasterTradeSkills is enabled";
-	MTS_DISABLED = "MasterTradeSkills is disabled";
-	BINDING_NAME_MTS_TEXT	= "Configure Options";
-	BINDING_NAME_MTS_SHOW	= "Show Recipe List";
+-- Global Variables
+MTS_RECIPES = "Recipes";
+MTS_TRADESKILLS = {
+    [1] = "Cooking";
+    [2] = "Tailoring";
+    [3] = "Enchanting";
+    [4] = "Leatherworking";
+    [5] = "Blacksmithing";
+    [6] = "Alchemy";
+    [7] = "Engineering";
+    [8] = "First Aid";
+    [9] = "Mining";
+    [10] = "Poisons";
+};
 
-	-- Global Variables
-	MTS_RECIPES = "Recipes";
-	MTS_TRADESKILLS = {
-		[1] = "Cooking";
-		[2] = "Tailoring";
-		[3] = "Enchanting";
-		[4] = "Leatherworking";
-		[5] = "Blacksmithing";
-		[6] = "Alchemy";
-		[7] = "Engineering";
-		[8] = "First Aid";
-		[9] = "Mining";
-		[10] = "Poisons";
-	};
+-- Dont know if there are localized versions of these...
+MTS_TRADESKILL_SKILLLEVEL = {
+    [1] = "trivial";
+    [2] = "easy";
+    [3] = "medium";
+    [4] = "optimal";
+    [5] = "unknown";
+};
 
-	-- Dont know if there are localized versions of these...
-	MTS_TRADESKILL_SKILLLEVEL = {
-		[1] = "trivial";
-		[2] = "easy";
-		[3] = "medium";
-		[4] = "optimal";
-		[5] = "unknown";
-	};
-	
-		MTS_DIF1 = "Show |cFFA0A0A0[ Trivial ]";
-		MTS_DIF2 = "Show |cFF40C040[ Easy ]";
-		MTS_DIF3 = "Show |cFFFFEE00[ Medium ]";
-		MTS_DIF4 = "Show |cFFFF9900[ Optimal ]";
-		MTS_DIF5 = "Show |cFFFF0000[ Too High ]";
-		MTS_REVERSE = "Higher Level Recipes First";
+MTS_DIF1 = "Show |cFFA0A0A0[ Trivial ]";
+MTS_DIF2 = "Show |cFF40C040[ Easy ]";
+MTS_DIF3 = "Show |cFFFFEE00[ Medium ]";
+MTS_DIF4 = "Show |cFFFF9900[ Optimal ]";
+MTS_DIF5 = "Show |cFFFF0000[ Too High ]";
+MTS_REVERSE = "Higher Level Recipes First";
 
-	MTS_OPT_ENABLE = "Enable " .. MTS_NAME;
-	MTS_OPT_SHOWLEARNED = "Show learned recipes";
-	MTS_OPT_SHOWNOTLEARNED = "Show recipes which aren't learned";
-	MTS_OPT_SHOWTRADESKILLS = "Show the following tradeskills:";
-	MTS_OPT_UNKNOWNTOBOT = "Unknown Recipes Last";
-	MTS_OPT_ALTNAME = "Show Alt Name";
-	MTS_OPT_NOMINIMAP = "No Minimap Recipes";
-	MTS_NUMTOSHOW_TIP = "Max Number Of Lines To Show In The Tooltip";
+MTS_OPT_ENABLE = "Enable " .. MTS_NAME;
+MTS_OPT_SHOWLEARNED = "Show learned recipes";
+MTS_OPT_SHOWNOTLEARNED = "Show recipes which aren't learned";
+MTS_OPT_SHOWTRADESKILLS = "Show the following tradeskills:";
+MTS_OPT_UNKNOWNTOBOT = "Unknown Recipes Last";
+MTS_OPT_ALTNAME = "Show Alt Name";
+MTS_OPT_NOMINIMAP = "No Minimap Recipes";
+MTS_NUMTOSHOW_TIP = "Max Number Of Lines To Show In The Tooltip";
 MTS_RECURSEALL = "All";
 
 MTS_RVENDOR = "Vendor";
@@ -85,9 +84,8 @@ MTS_RDROP = "Drop";
 MTS_RUNKNOWN = "Unknown";
 MTS_RQUEST = "Quest";
 
-	
 MTS_UNKNOWN = "Please Inform Triadian That The Locale Is Missing For  ";
-MTS_RECIPENAME = {	
+MTS_RECIPENAME = {
     ["Accurate Scope"] = "Accurate Scope",
     ["Admiral's Hat"] = "Admiral's Hat",
     ["Advanced Target Dummy"] = "Advanced Target Dummy",
@@ -1350,5 +1348,4 @@ MTS_RECIPENAME = {
     ["Wound Poison III"] = "Wound Poison III",
     ["Wound Poison IV"] = "Wound Poison IV",
     ["Wound Poison"] = "Wound Poison",
-
 };

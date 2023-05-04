@@ -1,51 +1,51 @@
 function MasterTradeSkills_LoadGerman()
--- Global Variables 
-MTS_LOADED = "Master Trade Skills v".. MTS_VERSION .. " AddOn geladen"; 
-MTS_HELP = { 
-[1] = "|cFFFF0000MasterTradeSkills commands:|r"; 
-[2] = "/MTS On : MasterTradeSkills einschalten"; 
-[3] = "/MTS Off : MasterTradeSkills ausschalten"; 
-[4] = "/MTS Toggle : Zwischen ein/aus umschalten"; 
-[5] = "/MTS Options : Optionen anzeigen"; 
-[6] = "/MTS Show : Zeigt alle Rezepte ohne jegliche Filter"; 
-}; 
-MTS_WRONGSLASH = "F\195\188r Hilfe tippe \"/MasterTradeSkills help\""; 
-MTS_ENABLED = "MasterTradeSkills ist aktiviert"; 
-MTS_DISABLED = "MasterTradeSkills ist deaktiviert"; 
-BINDING_NAME_MTS_TEXT = "Optionen konfigurieren"; 
+-- Global Variables
+MTS_LOADED = "Master Trade Skills v".. MTS_VERSION .. " AddOn geladen";
+MTS_HELP = {
+    [1] = "|cFFFF0000MasterTradeSkills commands:|r";
+    [2] = "/MTS On : MasterTradeSkills einschalten";
+    [3] = "/MTS Off : MasterTradeSkills ausschalten";
+    [4] = "/MTS Toggle : Zwischen ein/aus umschalten";
+    [5] = "/MTS Options : Optionen anzeigen";
+    [6] = "/MTS Show : Zeigt alle Rezepte ohne jegliche Filter";
+};
+MTS_WRONGSLASH = "F\195\188r Hilfe tippe \"/MasterTradeSkills help\"";
+MTS_ENABLED = "MasterTradeSkills ist aktiviert";
+MTS_DISABLED = "MasterTradeSkills ist deaktiviert";
+BINDING_NAME_MTS_TEXT = "Optionen konfigurieren";
 BINDING_NAME_MTS_SHOW = "Rezeptliste anzeigen";
 
--- Global Variables 
-MTS_RECIPES = "Rezepte"; 
-MTS_TRADESKILLS = { 
-[1] = "Kochkunst"; 
-[2] = "Schneiderei"; 
-[3] = "Verzauberkunst"; 
-[4] = "Lederverarbeitung"; 
-[5] = "Schmiedekunst"; 
-[6] = "Alchimie"; 
-[7] = "Ingenieurskunst"; 
-[8] = "Erste Hilfe"; 
-[9] = "Bergbau"; 
-[10] = "Gifte"; 
-}; 
--- Dont know if there are localized versions of these... 
- 
-  MTS_DIF1 = "Zeige |cFFA0A0A0[ Trivial ]"; 
-  MTS_DIF2 = "Zeige |cFF40C040[ Leicht ]"; 
-  MTS_DIF3 = "Zeige |cFFFFEE00[ Mittel ]"; 
-  MTS_DIF4 = "Zeige |cFFFF9900[ Optimal ]"; 
-  MTS_DIF5 = "Zeige |cFFFF0000[ Zu hoch ]"; 
-  MTS_REVERSE = "Schwere Rezepte zuerst"; 
- 
-MTS_OPT_ENABLE = "Aktiviere " .. MTS_NAME; 
-MTS_OPT_SHOWLEARNED = "Bereits bekannte Rezepte anzeigen"; 
-MTS_OPT_SHOWNOTLEARNED = "Nicht bekannte Rezepte anzeigen"; 
-MTS_OPT_SHOWTRADESKILLS = "Die folgenden Fertigkeiten anzeigen:"; 
-MTS_OPT_UNKNOWNTOBOT = "Unbekannte Rezepte zuletzt";   
-MTS_OPT_ALTNAME = "Charnamen zeigen";   
-MTS_OPT_NOMINIMAP = "Keine Minimap-Rezepte"; 
-MTS_NUMTOSHOW_TIP = "Max. Zeilenanzahl die im Tooltip angezeigt wird"; 
+-- Global Variables
+MTS_RECIPES = "Rezepte";
+MTS_TRADESKILLS = {
+    [1] = "Kochkunst";
+    [2] = "Schneiderei";
+    [3] = "Verzauberkunst";
+    [4] = "Lederverarbeitung";
+    [5] = "Schmiedekunst";
+    [6] = "Alchimie";
+    [7] = "Ingenieurskunst";
+    [8] = "Erste Hilfe";
+    [9] = "Bergbau";
+    [10] = "Gifte";
+};
+-- Dont know if there are localized versions of these...
+
+MTS_DIF1 = "Zeige |cFFA0A0A0[ Trivial ]";
+MTS_DIF2 = "Zeige |cFF40C040[ Leicht ]";
+MTS_DIF3 = "Zeige |cFFFFEE00[ Mittel ]";
+MTS_DIF4 = "Zeige |cFFFF9900[ Optimal ]";
+MTS_DIF5 = "Zeige |cFFFF0000[ Zu hoch ]";
+MTS_REVERSE = "Schwere Rezepte zuerst";
+
+MTS_OPT_ENABLE = "Aktiviere " .. MTS_NAME;
+MTS_OPT_SHOWLEARNED = "Bereits bekannte Rezepte anzeigen";
+MTS_OPT_SHOWNOTLEARNED = "Nicht bekannte Rezepte anzeigen";
+MTS_OPT_SHOWTRADESKILLS = "Die folgenden Fertigkeiten anzeigen:";
+MTS_OPT_UNKNOWNTOBOT = "Unbekannte Rezepte zuletzt";
+MTS_OPT_ALTNAME = "Charnamen zeigen";
+MTS_OPT_NOMINIMAP = "Keine Minimap-Rezepte";
+MTS_NUMTOSHOW_TIP = "Max. Zeilenanzahl die im Tooltip angezeigt wird";
 MTS_RECURSEALL = "Alles";
 
 MTS_RVENDOR = "H\195\164ndler";
@@ -59,7 +59,7 @@ MTS_RECIPENAME = {
     ["Accurate Scope"] = "Genaues Zielfernrohr",
     ["Admiral's Hat"] = "Admiralshut",
     ["Advanced Target Dummy"] = "Hochentwickelte Zielattrappe",
-    ["Alarm-O-Bot"] = "Alarm-O-Bot",											-- same?
+    ["Alarm-O-Bot"] = "Alarm-O-Bot",                                            -- same?
     ["Alchemist's Stone"] = "Alchemist's Stone",
     ["Annihilator"] = "Vernichter",
     ["Anti-Venom"] = "Gegengift",
@@ -129,11 +129,11 @@ MTS_RECIPENAME = {
     ["Blackguard"] = "Finsterer Streiter",
     ["Blackmouth Oil"] = "Schwarzmaul\195\182l",
     ["Blazing Rapier"] = "Loderflammenrapier",
-    ["Bleakwood Hew"] = "Bleakwood-Hippe",										-- Old 
+    ["Bleakwood Hew"] = "Bleakwood-Hippe",                                        -- Old
     ["Blight"] = "Verseuchung",
     ["Blinding Powder"] = "Blendungspulver",
     ["Blood Sausage"] = "Blutwurst",
-    ["Blood Talon"] = "Blutkralle",												-- Old
+    ["Blood Talon"] = "Blutkralle",                                                -- Old
     ["Blood Tiger Breastplate"] = "Bluttigerbrustplatte",
     ["Blood Tiger Shoulders"] = "Bluttigerschultern",
     ["Bloodsoul Breastplate"] = "Blutseelenbrustplatte",
@@ -160,7 +160,7 @@ MTS_RECIPENAME = {
     ["Bolt of Runecloth"] = "Runenstoffballen",
     ["Bolt of Silk Cloth"] = "Seidenstoffballen",
     ["Bolt of Woolen Cloth"] = "Wollstoffballen",
-    ["Boots of Darkness"] = "Stiefel der Dunkelheit",								-- Unknown
+    ["Boots of Darkness"] = "Stiefel der Dunkelheit",                                -- Unknown
     ["Boots of the Enchanter"] = "Stiefel des Verzauberers",
     ["Bottomless Bag"] = "Bodenlose Tasche",
     ["Bramblewood Belt"] = "Dornenholzg\195\188rtel",
@@ -185,7 +185,7 @@ MTS_RECIPENAME = {
     ["Bronze Tube"] = "Bronzer\195\164hre",
     ["Bronze Warhammer"] = "Bronzener Kriegshammer",
     ["Brown Linen Pants"] = "Braune Leinenhose",
-    ["Brown Linen Robe"] = "Braune Leinenrobe", 
+    ["Brown Linen Robe"] = "Braune Leinenrobe",
     ["Brown Linen Shirt"] = "Braunes Leinenhemd",
     ["Brown Linen Vest"] = "Braune Leinenweste",
     ["Carrion Surprise"] = "Aas Surprise",
@@ -196,7 +196,7 @@ MTS_RECIPENAME = {
     ["Chimeric Boots"] = "Schim\195\164renstiefel",
     ["Chimeric Gloves"] = "Schim\195\164renhandschuhe",
     ["Chimeric Leggings"] = "Schim\195\164rengamaschen",
-    ["Chimeric Vest"] = "	Schim\195\164renweste",
+    ["Chimeric Vest"] = "    Schim\195\164renweste",
     ["Chromatic Cloak"] = "Chromatischer Umhang",
     ["Chromatic Gauntlets"] = "Chromatische Stulpen",
     ["Cindercloth Boots"] = "Aschenstoffstiefel",
@@ -238,7 +238,7 @@ MTS_RECIPENAME = {
     ["Corehound Belt"] = "Kernhundg\195\188rtel",
     ["Corehound Boots"] = "Kernhundstiefel",
     ["Corruption"] = "Verderbnis",
-    ["Cowardly Flight Potion"] = "Trank der feigen Flucht",						-- old?
+    ["Cowardly Flight Potion"] = "Trank der feigen Flucht",                        -- old?
     ["Coyote Steak"] = "Kojotensteak",
     ["Crab Cake"] = "Krebsk\195\188chlein",
     ["Crafted Heavy Shot"] = "Gefertigtes schweres Geschoss",
@@ -266,7 +266,7 @@ MTS_RECIPENAME = {
     ["Cured Thick Hide"] = "Geschmeidiger dicker Balg",
     ["Curiously Tasty Omelet"] = "Seltsam schmeckendes Omelett",
     ["Dark Iron Bomb"] = "Dunkeleisenbombe",
-    ["Dark Iron Boots"] = "Dunkeleisenstiefel",									-- Not in RD ?
+    ["Dark Iron Boots"] = "Dunkeleisenstiefel",                                    -- Not in RD ?
     ["Dark Iron Bracers"] = "Dunkeleisenarmschienen",
     ["Dark Iron Destroyer"] = "Dunkeleisenzerst\195\182rer",
     ["Dark Iron Gauntlets"] = "Dunkeleisenstulpen",
@@ -282,7 +282,7 @@ MTS_RECIPENAME = {
     ["Dark Leather Belt"] = "Dunkler Lederg\195\188rtel",
     ["Dark Leather Boots"] = "Dunkle Lederstiefel",
     ["Dark Leather Cloak"] = "Dunkler Lederumhang",
-    ["Dark Leather Gloves"] = "	Dunkle Lederhandschuhe",
+    ["Dark Leather Gloves"] = "    Dunkle Lederhandschuhe",
     ["Dark Leather Pants"] = "Dunkle Lederhose",
     ["Dark Leather Shoulders"] = "Dunkle Lederschultern",
     ["Dark Leather Tunic"] = "Dunkle Ledertunika",
@@ -293,10 +293,10 @@ MTS_RECIPENAME = {
     ["Darksoul Breastplate"] = "Dunkelseelenbrustplatte",
     ["Darksoul Leggings"] = "Dunkelseelengamaschen",
     ["Darksoul Shoulders"] = "Dunkelseelenschultern",
-    ["Darkspear"] = "Darkspear",												-- old
+    ["Darkspear"] = "Darkspear",                                                -- old
     ["Dawn Treaders"] = "Stiefel der D\195\164mmerung",
     ["Dawn's Edge"] = "D\195\164mmerungsschneide",
-    ["Dawnbringer Shoulders"] = "Dawnbringer-Schultern",							-- old
+    ["Dawnbringer Shoulders"] = "Dawnbringer-Schultern",                            -- old
     ["Dazzling Mithril Rapier"] = "Funkelndes Mithrilrapier",
     ["Deadly Blunderbuss"] = "T\195\182dliche Donnerb\195\188chse",
     ["Deadly Bronze Poniard"] = "T\195\182dlicher Bronzepoignard",
@@ -377,9 +377,9 @@ MTS_RECIPENAME = {
     ["Elixir of Superior Defense"] = "Elixier der \195\188berragenden Verteidigung",
     ["Elixir of the Mongoose"] = "Elixier des Mungos",
     ["Elixir of the Sages"] = "Elixier der Weisen",
-    ["Elixir of Tongues"] = "Elixier der Sprachen",								-- Not Yet Implemented
+    ["Elixir of Tongues"] = "Elixier der Sprachen",                                -- Not Yet Implemented
     ["Elixir of Water Breathing"] = "Elixier der Wasseratmung",
-    ["Elixir of Waterwalking"] = "Elixier des Wasserwandelns", 
+    ["Elixir of Waterwalking"] = "Elixier des Wasserwandelns",
     ["Elixir of Wisdom"] = "Elixier der Weisheit",
     ["Embossed Leather Boots"] = "Gepr\195\164gte Lederstiefel",
     ["Embossed Leather Cloak"] = "Gepr\195\164gter Lederumhang",
@@ -1324,5 +1324,4 @@ MTS_RECIPENAME = {
     ["Wound Poison III"] = "Wundgift III",
     ["Wound Poison IV"] = "Wundgift IV",
     ["Wound Poison"] = "Wundgift",
-    };
-end
+};

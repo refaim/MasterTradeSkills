@@ -1,8 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
-	<Script file="Localization.lua" /> 
+	<Script file="Localization.lua" />
 	<Script file="Localization_deDE.lua" />
- 	<Script file="Localization_frFR.lua" /> 
-	<Script file="MasterTradeSkills.lua" /> 
+ 	<Script file="Localization_frFR.lua" />
+	<Script file="MasterTradeSkills.lua" />
 	<Frame name="MasterTradeSkillsFrame" parent="GameTooltip" hidden="false">
 		<Scripts>
 			<OnLoad>
@@ -16,7 +16,7 @@
 			</OnShow>
 		</Scripts>
 	</Frame>
-	
+
 	<Frame name="MTS_OptionsFrame" enableMouse="true" movable="true" parent="UIParent" hidden="true" inherits="DialogBoxFrame">
 		<Size>
 			<AbsDimension x="400" y="450"/>
@@ -28,7 +28,7 @@
  				</Offset>
 			</Anchor>
 		</Anchors>
-		
+
 		<Layers>
 			<Layer level="ARTWORK">
 				<Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
@@ -88,7 +88,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				
+
 
 				<FontString name="$parentText_ShowTradeSkills1" inherits="GameFontNormal" text="MTS_TRADESKILLS[1]">
 					<Anchors>
@@ -270,10 +270,10 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				
+
 			</Layer>
-		</Layers>	
-		
+		</Layers>
+
 		<Frames>
 			<CheckButton name="$parentCheck_Enabled" inherits="OptionsCheckButtonTemplate" checked="true">
 				<Anchors>
@@ -317,7 +317,7 @@
 					</OnClick>
 				</Scripts>
 			</CheckButton>
-			
+
 			-- Tradeskill buttons
 			<CheckButton name="$parentCheck_ShowTradeSkills1" inherits="OptionsCheckButtonTemplate" checked="true">
 				<Anchors>
@@ -602,12 +602,12 @@
 					</OnClick>
 				</Scripts>
 			</CheckButton>
-			
 
-			
+
+
 
 		</Frames>
-		
+
 		<Scripts>
 			<OnMouseUp>
 				if ( this.isMoving ) then
@@ -631,8 +631,8 @@
 
 
 	</Frame>
-	
-	<Frame name="MTS_RecipeFrame" enableMouse="true" movable="true" parent="UIParent" hidden="true"> 
+
+	<Frame name="MTS_RecipeFrame" enableMouse="true" movable="true" parent="UIParent" hidden="true">
 		<Anchors>
 			<Anchor point="LEFT"/>
 		</Anchors>
@@ -690,10 +690,10 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
-				<Scripts> 
-					<OnLoad> 
-					</OnLoad> 
-				</Scripts> 
+				<Scripts>
+					<OnLoad>
+					</OnLoad>
+				</Scripts>
 				<FontString inherits="ChatFontNormal" justifyH="LEFT"/>
 			</ScrollingMessageFrame>
 			<Button name="$parentButtonClose" inherits="UIPanelCloseButton">
@@ -728,12 +728,12 @@
 			</Button>
 
 		</Frames>
-		<Scripts> 
-			<OnLoad> 
+		<Scripts>
+			<OnLoad>
 				-- set our default colors
 				this:SetBackdropBorderColor(0.6, 0.6, 0.6);
 				this:SetBackdropColor(0, 0, 0);
-			</OnLoad> 
-		</Scripts> 
-	</Frame> 
+			</OnLoad>
+		</Scripts>
+	</Frame>
 </Ui>

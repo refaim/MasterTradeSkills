@@ -1,5 +1,5 @@
 ## Interface: 11200
-## Title : MasterTradeSkills
+## Title: MasterTradeSkills
 ## Notes: This AddOn adjusts the display of the tooltips to show which recipe is being used by the item your hovering above
 ## Author: Triadian
 ## eMail: Triadian@Gmail.com
