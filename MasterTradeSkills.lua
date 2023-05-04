@@ -899,33 +899,27 @@ function MTS_Options_ToggleShowTradeSkills(arg1, arg2)
     getglobal("MTS_OptionsFrameCheck_ShowTradeSkills" .. arg2):SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOW_TRADESKILLS[arg2]);
 end
 
-function MTS_SetItemRef(arg1,arg2,arg3)
-    if ( strsub(arg1, 1, 6) == "player" ) then
-        return MTS_Original_SetItemRef(arg1,arg2,arg3);
-    end
-    if ( IsControlKeyDown() or  IsShiftKeyDown()  ) then
-        return MTS_Original_SetItemRef(arg1,arg2,arg3);
-    end
-    if (IRR_ItemTypes) then
-        return MTS_Original_SetItemRef(arg1,arg2,arg3);
+function MTS_SetItemRef(link, text, button)
+    local prefixSupported = strsub(link, 1, strlen("item")) == "item"
+    if not prefixSupported or IsControlKeyDown() or IsShiftKeyDown() or IRR_ItemTypes then
+        return MTS_Original_SetItemRef(link, text, button)
     end
 
-    ShowUIPanel(ItemRefTooltip);
-    if ( not ItemRefTooltip:IsVisible() ) then
-        ItemRefTooltip:SetOwner(UIParent, "ANCHOR_PRESERVE");
+    ShowUIPanel(ItemRefTooltip)
+    if not ItemRefTooltip:IsVisible() then
+        ItemRefTooltip:SetOwner(UIParent, "ANCHOR_PRESERVE")
     end
-    ItemRefTooltip:SetHyperlink( arg1);
-    if ( HealPoints ) then
-        HealPoints:DrawTooltip(ItemRefTooltip, arg1);
-    end
-    local name, ilink, quality = GetItemInfo( arg1 );
+    ItemRefTooltip:SetHyperlink(link)
 
-    MasterTradeSkills_CheckTooltipInfo(ItemRefTooltip, name);
-    return ;
+    if HealPoints then
+        HealPoints:DrawTooltip(ItemRefTooltip, link)
+    end
+
+    local name, _ = GetItemInfo(link);
+    MasterTradeSkills_CheckTooltipInfo(ItemRefTooltip, name)
 end
 
 function MasterTradeSkills_AddStuff(frame,link)
-    local name, ilink, quality = GetItemInfo( link );
-    MasterTradeSkills_CheckTooltipInfo(frame, name);
-    return ;
+    local name, _ = GetItemInfo(link)
+    MasterTradeSkills_CheckTooltipInfo(frame, name)
 end
