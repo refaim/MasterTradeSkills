@@ -19,7 +19,7 @@
 
 	<Frame name="MTS_OptionsFrame" enableMouse="true" movable="true" parent="UIParent" hidden="true" inherits="DialogBoxFrame">
 		<Size>
-			<AbsDimension x="400" y="450"/>
+			<AbsDimension x="400" y="475"/>
 		</Size>
 		<Anchors>
 			<Anchor point="CENTER">
@@ -61,7 +61,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentText_ShowLearned" inherits="GameFontNormal" text="MTS_OPT_SHOWLEARNED">
+				<FontString name="$parentText_ShowOnShiftKeyDown" inherits="GameFontNormal" text="MTS_OPT_SHOWONSHIFTKEYDOWN">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
@@ -70,7 +70,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentText_ShowNotLearned" inherits="GameFontNormal" text="MTS_OPT_SHOWNOTLEARNED">
+				<FontString name="$parentText_ShowLearned" inherits="GameFontNormal" text="MTS_OPT_SHOWLEARNED">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
@@ -79,11 +79,20 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentText_ShowTradeSkills" inherits="GameFontNormal" text="MTS_OPT_SHOWTRADESKILLS">
+				<FontString name="$parentText_ShowNotLearned" inherits="GameFontNormal" text="MTS_OPT_SHOWNOTLEARNED">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
 								<AbsDimension x="50" y="-105" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText_ShowTradeSkills" inherits="GameFontNormal" text="MTS_OPT_SHOWTRADESKILLS">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
+							<Offset>
+								<AbsDimension x="50" y="-130" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -94,7 +103,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="50" y="-130" />
+								<AbsDimension x="50" y="-155" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -103,7 +112,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="50" y="-155" />
+								<AbsDimension x="50" y="-180" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -112,7 +121,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="50" y="-180" />
+								<AbsDimension x="50" y="-205" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -121,7 +130,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="50" y="-205" />
+								<AbsDimension x="50" y="-230" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -130,7 +139,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="50" y="-230" />
+								<AbsDimension x="50" y="-255" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -139,7 +148,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="260" y="-130" />
+								<AbsDimension x="260" y="-155" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -148,7 +157,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="260" y="-155" />
+								<AbsDimension x="260" y="-180" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -157,7 +166,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="260" y="-180" />
+								<AbsDimension x="260" y="-205" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -166,7 +175,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="260" y="-205" />
+								<AbsDimension x="260" y="-230" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -175,7 +184,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="260" y="-230" />
+								<AbsDimension x="260" y="-255" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -184,7 +193,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="50" y="-255" />
+								<AbsDimension x="50" y="-280" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -193,7 +202,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="50" y="-335" />
+								<AbsDimension x="50" y="-360" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -202,7 +211,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="50" y="-285" />
+								<AbsDimension x="50" y="-310" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -211,7 +220,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="50" y="-310" />
+								<AbsDimension x="50" y="-335" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -220,7 +229,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="260" y="-285" />
+								<AbsDimension x="260" y="-310" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -229,7 +238,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="260" y="-310" />
+								<AbsDimension x="260" y="-335" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -238,7 +247,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="260" y="-335" />
+								<AbsDimension x="260" y="-360" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -247,7 +256,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="50" y="-360" />
+								<AbsDimension x="50" y="-385" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -256,7 +265,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="260" y="-360" />
+								<AbsDimension x="260" y="-385" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -265,7 +274,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 							<Offset>
-								<AbsDimension x="50" y="-385" />
+								<AbsDimension x="50" y="-410" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -289,11 +298,25 @@
 					</OnClick>
 				</Scripts>
 			</CheckButton>
-			<CheckButton name="$parentCheck_ShowLearned" inherits="OptionsCheckButtonTemplate" checked="true">
+			<CheckButton name="$parentCheck_ShowOnShiftKeyDown" inherits="OptionsCheckButtonTemplate" checked="false">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
 							<AbsDimension x="20" y="-45"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MTS_Options_ToggleShowOnShiftKeyDown();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentCheck_ShowLearned" inherits="OptionsCheckButtonTemplate" checked="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
+						<Offset>
+							<AbsDimension x="20" y="-70"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -307,7 +330,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="20" y="-70"/>
+							<AbsDimension x="20" y="-95"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -323,7 +346,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="20" y="-120"/>
+							<AbsDimension x="20" y="-145"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -337,7 +360,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="20" y="-145"/>
+							<AbsDimension x="20" y="-170"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -351,7 +374,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="20" y="-170"/>
+							<AbsDimension x="20" y="-195"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -365,7 +388,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="20" y="-195"/>
+							<AbsDimension x="20" y="-220"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -379,7 +402,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="20" y="-220"/>
+							<AbsDimension x="20" y="-245"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -393,7 +416,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="230" y="-120"/>
+							<AbsDimension x="230" y="-145"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -407,7 +430,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="230" y="-145"/>
+							<AbsDimension x="230" y="-170"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -421,7 +444,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="230" y="-170"/>
+							<AbsDimension x="230" y="-195"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -435,7 +458,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="230" y="-195"/>
+							<AbsDimension x="230" y="-220"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -449,7 +472,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="230" y="-220"/>
+							<AbsDimension x="230" y="-250"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -466,7 +489,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="30" y="-250"/>
+							<AbsDimension x="30" y="-275"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -480,7 +503,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="20" y="-325"/>
+							<AbsDimension x="20" y="-350"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -494,7 +517,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="20" y="-275"/>
+							<AbsDimension x="20" y="-300"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -508,7 +531,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="20" y="-300"/>
+							<AbsDimension x="20" y="-325"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -522,7 +545,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="230" y="-275"/>
+							<AbsDimension x="230" y="-300"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -536,7 +559,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="230" y="-300"/>
+							<AbsDimension x="230" y="-325"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -550,7 +573,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="230" y="-325"/>
+							<AbsDimension x="230" y="-350"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -564,7 +587,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="20" y="-350"/>
+							<AbsDimension x="20" y="-375"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -578,7 +601,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="230" y="-350"/>
+							<AbsDimension x="230" y="-375"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -592,7 +615,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="MTS_OptionsFrame">
 						<Offset>
-							<AbsDimension x="20" y="-375"/>
+							<AbsDimension x="20" y="-400"/>
 						</Offset>
 					</Anchor>
 				</Anchors>

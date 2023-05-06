@@ -69,6 +69,7 @@ MTS_DIF5 = "Show |cFFFF0000[ Too High ]";
 MTS_REVERSE = "Higher Level Recipes First";
 
 MTS_OPT_ENABLE = "Enable " .. MTS_NAME;
+MTS_OPT_SHOWONSHIFTKEYDOWN = "Show while holding shift";
 MTS_OPT_SHOWLEARNED = "Show learned recipes";
 MTS_OPT_SHOWNOTLEARNED = "Show recipes which aren't learned";
 MTS_OPT_SHOWTRADESKILLS = "Show the following tradeskills:";
