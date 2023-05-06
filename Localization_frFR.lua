@@ -39,6 +39,7 @@ MTS_DIF5 = "Afficher |cFFFF0000[ Tr\195\168s Difficile ]";
 MTS_REVERSE = "Afficher recette de haut niveau d'abord";
 
 MTS_OPT_ENABLE = "Activer " .. MTS_NAME;
+MTS_OPT_SHOWONSHIFTKEYDOWN = "Afficher en maintenant la touche Maj";
 MTS_OPT_SHOWLEARNED = "Afficher les recettes connues";
 MTS_OPT_SHOWNOTLEARNED = "Afficher les recettes iconnues";
 MTS_OPT_SHOWTRADESKILLS = "Afficher les m\195\169tiers:";

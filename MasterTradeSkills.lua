@@ -195,6 +195,7 @@ function MasterTradeSkills_InitData()
             if(not MTS_DATA.Characters[MTS_CHAR_INDEX].Options) then
                 MTS_DATA.Characters[MTS_CHAR_INDEX].Options = {};
                 MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE = 1;
+                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN = 0;
                 MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWLEARNED = 1;
                 MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWNOTLEARNED = 1;
                 MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOW_TRADESKILLS = {};
@@ -225,6 +226,7 @@ function MasterTradeSkills_InitData()
 
             end
         end
+        if (not MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN ) then MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN = 0; end
         if (not MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_NUMTOSHOW ) then MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_NUMTOSHOW = 10; end
         if (not MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWREV ) then MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWREV = 1; end
         if (not MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF1 ) then MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF1 = 1; end
@@ -238,6 +240,7 @@ function MasterTradeSkills_InitData()
 
         -- Initialize the options panel
         MTS_OptionsFrameCheck_Enabled:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE);
+        MTS_OptionsFrameCheck_ShowOnShiftKeyDown:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN);
         MTS_OptionsFrameCheck_ShowLearned:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWLEARNED);
         MTS_OptionsFrameCheck_ShowNotLearned:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWNOTLEARNED);
         MTS_OptionsFrameCheck_Show_Dif1:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF1);
@@ -740,7 +743,10 @@ function MTS_CompareName(a,b)
 end
 
 function MasterTradeSkills_OnShow()
-    if (MTS_PLAYER_NAME_KNOWN and MTS_VARIABLES_LOADED and MTS_DATA_CHECKED and MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE == 1) then
+    if (MTS_PLAYER_NAME_KNOWN and MTS_VARIABLES_LOADED and MTS_DATA_CHECKED
+        and MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE == 1
+        and (MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN == 0 or IsShiftKeyDown()) ) then
+
         -- show info in tooltip
         if ( MouseIsOver(MinimapCluster) == 1 and MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_MOUSEOVER == 1 ) then
             GameTooltip:Show();
@@ -841,6 +847,15 @@ function MTS_Options_Toggle()
         MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE = 1;
     end
     MTS_OptionsFrameCheck_Enabled:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE);
+end
+
+function MTS_Options_ToggleShowOnShiftKeyDown()
+    if (MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN == 1) then
+        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN = 0;
+    else
+        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN = 1;
+    end
+    MTS_OptionsFrameCheck_ShowOnShiftKeyDown:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN);
 end
 
 function MTS_Options_ToggleShowLearned()

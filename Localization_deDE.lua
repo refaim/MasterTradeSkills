@@ -39,6 +39,7 @@ MTS_DIF5 = "Zeige |cFFFF0000[ Zu hoch ]";
 MTS_REVERSE = "Schwere Rezepte zuerst";
 
 MTS_OPT_ENABLE = "Aktiviere " .. MTS_NAME;
+MTS_OPT_SHOWONSHIFTKEYDOWN = "Bei gedrückter Umschalttaste anzeigen";
 MTS_OPT_SHOWLEARNED = "Bereits bekannte Rezepte anzeigen";
 MTS_OPT_SHOWNOTLEARNED = "Nicht bekannte Rezepte anzeigen";
 MTS_OPT_SHOWTRADESKILLS = "Die folgenden Fertigkeiten anzeigen:";
