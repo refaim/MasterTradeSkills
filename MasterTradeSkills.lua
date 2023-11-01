@@ -28,7 +28,6 @@ MTS_VARIABLES_LOADED = false;
 MTS_PLAYER_NAME_KNOWN = false;
 MTS_DATA_CHECKED = false;
 MTS_REAGENT_DATA = false;
-MTS_RECURSE = false;
 --------------------------------------------------------------------------------------------------
 -- Event functions
 --------------------------------------------------------------------------------------------------
@@ -286,49 +285,6 @@ function  MasterTradeSkills_Command(msg)
         else
             MTS_OptionsFrame:Show();
         end
-    elseif(msg == "show" ) then
-        MTS_RecipeList:SetFont(GameFontNormal:GetFont(), 13, "NORMAL");
-        MTS_RecipeFrameButtonRecurse:SetFont(GameFontNormal:GetFont(), 10, "NORMAL");
-        if (not MTS_RecipeList:GetScript("OnMouseWheel")) then
-            MTS_RecipeList:SetScript("OnMouseWheel",
-            function ()
-                if (arg1 > 0) then
-                    if (IsShiftKeyDown()) then
-                        this:ScrollToTop();
-                        for i = 1 , 34 do
-                            this:ScrollDown()
-                        end
-                    else
-                        this:ScrollUp()
-                        this:ScrollUp()
-                        this:ScrollUp()
-                    end
-                elseif (arg1 < 0) then
-                    if (IsShiftKeyDown()) then
-                        this:ScrollToBottom();
-                    else
-                        this:ScrollDown()
-                        this:ScrollDown()
-                        this:ScrollDown()
-                    end
-                end
-            end
-            );
-        end
-        MTS_RecipeList:EnableMouseWheel(1);
-        if (MTS_RecipeFrame:IsVisible()) then
-            MTS_RecipeFrame:Hide();
-        else
-            MTS_RecipeFrame:Show();
-            MTS_RecipeList:ScrollToTop();
-            for i = 1 , 34 do
-                MTS_RecipeList:ScrollDown()
-            end
-        end
-
-        if (ReagentData ~= nil) then
-            MTS_REAGENT_DATA = true;
-        end
     else
         MasterTradeSkills_Write(MTS_WRONGSLASH)
     end
@@ -378,8 +334,6 @@ function MasterTradeSkills_CheckTooltipInfo(frame, name)
 
                 -- Clear Tooltip Database
                 MTS_TOOLTIP_DB = {};
-                MTS_LIST_DB = {};
-                if ( textleft  == "" ) then MTS_RecipeList:Clear(); MTS_RecipeFrameHeaderText:SetText(name);  end
                 for Recipes in ReagentData['crafted'][MTS_TradeSkill] do
                     for Reagents in ReagentData['crafted'][MTS_TradeSkill][Recipes]['reagents'] do
                         if (name == Reagents) then
@@ -503,7 +457,6 @@ function MasterTradeSkills_CheckTooltipInfo(frame, name)
                                 end
                                 textleft = MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_RECIPE_COLOR .. " ".. prechar .."|r" .. skilllevel_color .. localeRecipes .. "|r";
                                 textright = MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_SOURCE_COLOR .. source .. "|r ";
-                                RECURSENAME2 = localeRecipes;
                                 if (skill ~= nil and skill ~= "") then
                                     if (skill > MTS_SkillLevel) then
                                         textright = textright .. MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_SKILL_COLOR_UNLEARNABLE .. "(" ..  skill .. ")|r";
@@ -519,10 +472,9 @@ function MasterTradeSkills_CheckTooltipInfo(frame, name)
                                 count[value] = count[value] + 1;
                                 -- If this is the first time a recipe is being added, add a explanation line
                                 if (count[value] == 1) then
-                                    if ( MTS_ShowTooltip == true and MTS_RECURSE == false ) then
+                                    if ( MTS_ShowTooltip == true ) then
                                         frame:AddDoubleLine(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_MAIN_COLOR .. MTS_RECIPES .. "|r", MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_MAIN_COLOR .. value .. " (" .. MTS_SkillLevel .. ")|r");
                                     end
-                                    MTS_RecipeList:AddMessage(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_MAIN_COLOR .. MTS_RECIPES .. "|r" .. "    ".. MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_MAIN_COLOR .. value .. " (" .. MTS_SkillLevel .. ")|r");
                                 end
                                 if (AltKnownBy ~= "" and MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_ALTNAME == 1 ) then
                                    textright =  AltKnownBy;
@@ -541,144 +493,22 @@ function MasterTradeSkills_CheckTooltipInfo(frame, name)
                                 totalcount = totalcount+1
                                 table.insert(MTS_TOOLTIP_DB, {skilllvl=MTS_TOOLTIP_SKILLEVEL,{name=Recipes, textl=textleft, textr=textright}});
                             end
-                                table.insert(MTS_LIST_DB, {skilllvl=MTS_TOOLTIP_SKILLEVEL,{name=Recipes, textl=textleft, textr=textright}});
-
                         end
                     end
                 end
                 table.sort(MTS_TOOLTIP_DB, MTS_CompareSkilllvl);
                 for i=1, table.getn(MTS_TOOLTIP_DB) do
-                    if (MTS_RECURSE == false) then
-                        for j=1, table.getn(MTS_TOOLTIP_DB[i]) do
-                            frame:AddDoubleLine(MTS_TOOLTIP_DB[i][j].textl, MTS_TOOLTIP_DB[i][j].textr);
-                        end
+                    for j=1, table.getn(MTS_TOOLTIP_DB[i]) do
+                        frame:AddDoubleLine(MTS_TOOLTIP_DB[i][j].textl, MTS_TOOLTIP_DB[i][j].textr);
                     end
                 end
                 MTS_TOOLTIP_DB = {};
-                table.sort(MTS_LIST_DB, MTS_CompareSkilllvl);
-                for i=1, table.getn(MTS_LIST_DB) do
-                    for j=1, table.getn(MTS_LIST_DB[i]) do
-                            MTS_RecipeList:AddMessage(MTS_LIST_DB[i][j].textl .." - ".. MTS_LIST_DB[i][j].textr);
-                                if (MTS_RECURSE == true and strsub(MTS_LIST_DB[i][j].textl,12,12) == "+" ) then
-                                    recus = string.find(MTS_LIST_DB[i][j].textl,"|",25)
-                                    RECURSENAME = strsub(MTS_LIST_DB[i][j].textl,25,recus - 1)
-                                    MasterTradeSkills_CheckRecurse(RECURSENAME);
-                                end
-                    end
-                end
-                MTS_LIST_DB = {};
             end
         end
-    end
-    local RepList = MTS_RecipeList:GetNumMessages()
-    if ( RepList < 35 ) then
-        for i = RepList, 35 do
-            MTS_RecipeList:AddMessage("   ");
-        end
-    end
-    MTS_RecipeList:ScrollToTop();
-    for i = 1 , 34 do
-        MTS_RecipeList:ScrollDown()
     end
 
     frame:Show();
 end
-
-function MTS_Recurse()
-name = MTS_RecipeFrameHeaderText:GetText();
-MTS_RECURSE = true;
-MasterTradeSkills_CheckTooltipInfo(GameTooltip, name);
-MTS_RECURSE = false;
-end
-
-function MasterTradeSkills_CheckRecurse(name)
-    local recurseprofessions = ReagentData_GetProfessions(name);
-        local recurseRecipes = "";
-        local recurseReagents = "";
-        local AltKnownBy = "";
-        if ( recurseprofessions == nil ) then return; end
-        -- Loop through the professions and recipes
-        for key, value in recurseprofessions do
-
-            RECURSEMTS_IS_TRADESKILL = MasterTradeSkill_IsTradeSkill(value);
-
-                if (RECURSEMTS_IS_TRADESKILL ~= 0) then
-                 local MTS_RecurseTradeSkill = MTS_TRADESKILLS_NAME[RECURSEMTS_IS_TRADESKILL];
-
-                for recurseRecipes in ReagentData['crafted'][MTS_RecurseTradeSkill] do
-                    for recurseReagents in ReagentData['crafted'][MTS_RecurseTradeSkill][recurseRecipes]['reagents'] do
-                        if (key ==1) then
-                                table.sort(ReagentData['crafted'][MTS_RecurseTradeSkill][recurseRecipes]['reagents'],  MTS_CompareSkilllvl);
-                        end
-                        if (name == recurseReagents) then
-                        skill = ReagentData['crafted'][MTS_RecurseTradeSkill][recurseRecipes]['skill'];
-                        source = ReagentData['crafted'][MTS_RecurseTradeSkill][recurseRecipes]['source'];
-
-                            -- Look if the skill is know, and what color it is
-                            skilllevel_color = "|cffff0000";
-                            local AltKnown = 0;
-                            local AltKnownBy = "";
-                            local localeRecipes = MTS_RECIPENAME[recurseRecipes];
-                                if (localeRecipes == nil) then
-                                    localeRecipes = recurseRecipes
-                                    MasterTradeSkills_Write(MTS_UNKNOWN..recurseRecipes);
-                                end
-                            -- First check if the data is read
-                            if (MTS_DATA[value] ~= nil) then
-                                -- Second check if the recipe is in the MTS database
-                                if (MTS_DATA[value][localeRecipes] ~= nil) then
-                                    -- Third look if it has been learnt by someone
-                                    if (MTS_DATA[value][localeRecipes].LearntBy ~= nil) then
-                                        -- Fourth check if the current user has learnt it
-                                        AltKnown = 1;
-                                        if (MTS_DATA[value][localeRecipes].LearntBy[MTS_CHAR_INDEX] ~= nil) then
-                                            for i=1,4 do
-                                                if (MTS_DATA[value][localeRecipes].LearntBy[MTS_CHAR_INDEX] == MTS_TRADESKILL_SKILLLEVEL[i]) then
-                                                    skilllevel_color = MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_TRADESKILL_SKILLLEVEL_COLOR[i];
-                                                    AltKnown = 0
-                                                end
-                                            end
-                                        else
-                                        local nb_chars = table.getn( MTS_DATA.Characters );
-                                            for i=1, nb_chars do
-                                                if (MTS_DATA[value][localeRecipes].LearntBy[i] ~= nil ) then
-                                                        for q=1,4 do
-                                                            if (MTS_DATA[value][localeRecipes].LearntBy[i] == MTS_TRADESKILL_SKILLLEVEL[q]) then
-                                                                Altskilllevel_color = MTS_DATA.Characters[i].Options.MTS_TRADESKILL_SKILLLEVEL_COLOR[q];
-                                                            end
-                                                        end
-                                                    if ( MTS_DATA.Characters[i].Realm == MTS_DATA.Characters[MTS_CHAR_INDEX].Realm and MTS_DATA.Characters[i].Faction == MTS_DATA.Characters[MTS_CHAR_INDEX].Faction) then
-                                                    AltKnownBy = AltKnownBy .."  |r" .. Altskilllevel_color .. "[".. MTS_DATA.Characters[i].Name .."]|r";
-                                                    end
-                                                end
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                            isreagent = {};
-                                isreagent = ReagentData_GetProfessions(recurseRecipes);
-                                    prechar = " -";
-                                if ( isreagent == nil ) then
-
-                                else
-                                    for key, value in isreagent do
-                                    prechar = "+";
-                                    end
-                                end
-                            textr = MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_SOURCE_COLOR .. value.." ("..skill..")";
-                                if (AltKnownBy ~= "" and MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_ALTNAME == 1 ) then
-                                   textr =  AltKnownBy;
-                                end
-                            MTS_RecipeList:AddMessage(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_RECIPE_COLOR .."    "..prechar.."|r"..skilllevel_color..localeRecipes.."   " .. textr .."|r");
-                        end
-                    end
-                end
-            end
-        end
-
-end
-
 
 function MTS_CompareSkilllvl(a,b)
     if ( MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWREV ) then

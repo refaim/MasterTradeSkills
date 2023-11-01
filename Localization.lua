@@ -29,7 +29,6 @@ MTS_HELP = {
     [3] = "/MTS Off : Turn MasterTradeSkills on";
     [4] = "/MTS Toggle : Toggle between on and off";
     [5] = "/MTS Options : Show the options dialog";
-    [6] = "/MTS Show : Shows All Recipes Without Any Filters";
 };
 MTS_WRONGSLASH = "For help type \"/MasterTradeSkills help\"";
 MTS_ENABLED = "MasterTradeSkills is enabled";
@@ -77,7 +76,6 @@ MTS_OPT_UNKNOWNTOBOT = "Unknown Recipes Last";
 MTS_OPT_ALTNAME = "Show Alt Name";
 MTS_OPT_NOMINIMAP = "No Minimap Recipes";
 MTS_NUMTOSHOW_TIP = "Max Number Of Lines To Show In The Tooltip";
-MTS_RECURSEALL = "All";
 
 MTS_RVENDOR = "Vendor";
 MTS_RTRAINER = "Trainer";

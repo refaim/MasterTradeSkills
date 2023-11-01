@@ -7,7 +7,6 @@ MTS_HELP = {
     [3] = "/MTS Off : MasterTradeSkills ausschalten";
     [4] = "/MTS Toggle : Zwischen ein/aus umschalten";
     [5] = "/MTS Options : Optionen anzeigen";
-    [6] = "/MTS Show : Zeigt alle Rezepte ohne jegliche Filter";
 };
 MTS_WRONGSLASH = "F\195\188r Hilfe tippe \"/MasterTradeSkills help\"";
 MTS_ENABLED = "MasterTradeSkills ist aktiviert";
@@ -47,7 +46,6 @@ MTS_OPT_UNKNOWNTOBOT = "Unbekannte Rezepte zuletzt";
 MTS_OPT_ALTNAME = "Charnamen zeigen";
 MTS_OPT_NOMINIMAP = "Keine Minimap-Rezepte";
 MTS_NUMTOSHOW_TIP = "Max. Zeilenanzahl die im Tooltip angezeigt wird";
-MTS_RECURSEALL = "Alles";
 
 MTS_RVENDOR = "H\195\164ndler";
 MTS_RTRAINER = "Lehrer";

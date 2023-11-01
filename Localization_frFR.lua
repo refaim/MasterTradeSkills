@@ -7,7 +7,6 @@ MTS_HELP = {
     [3] = "/MTS Off : D\195\169sactiver MasterTradeSkills";
     [4] = "/MTS Toggle : Basculer entre ON et OFF";
     [5] = "/MTS Options : Afficher les options";
-    [6] = "/MTS Show : Montrer Toutes les Recettes sans Filtrer";
 };
 MTS_WRONGSLASH = "Pour de l'aide taper \"/MasterTradeSkills help\"";
 MTS_ENABLED = "MasterTradeSkills est activ\195\169";
@@ -47,7 +46,6 @@ MTS_OPT_UNKNOWNTOBOT = "Recettes inconnues en dernier";
 MTS_OPT_ALTNAME = "Montrer nom du perso";
 MTS_OPT_NOMINIMAP = "Pas d'ic\195\180ne minimap";
 MTS_NUMTOSHOW_TIP = "Lignes Max. \195\160 afficher dans le tooltip";
-MTS_RECURSEALL = "Tout";
 
 MTS_RVENDOR = "Marchand";
 MTS_RTRAINER = "Instructeur";
