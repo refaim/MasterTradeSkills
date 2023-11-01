@@ -1,7 +1,7 @@
 -- General info
 MTS_NAME = "MasterTradeSkills";
-MTS_VERSION = "1.12";
-MTS_RELEASE = "August 24, 2006";
+MTS_VERSION = "1.12.4";
+MTS_RELEASE = "November 1, 2023";
 MTS_TITLE = MTS_NAME .. " - v" .. MTS_VERSION;
 MTS_DATA_VERSION = "1";
 BINDING_HEADER_MTS_SEP    = "Master Trade Skills";
