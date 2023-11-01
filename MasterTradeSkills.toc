@@ -4,7 +4,6 @@
 ## Author: Triadian (triadian@gmail.com)
 ## Version: 1.12.4
 ## Dependencies: ReagentData
-## OptionalDeps: MyAddons
-## DefaultState: enabled
 ## SavedVariables: MTS_DATA
+
 MasterTradeSkills.xml
