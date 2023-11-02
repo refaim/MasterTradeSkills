@@ -1,23 +1,4 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
-	<Script file="Localization.lua" />
-	<Script file="Localization_deDE.lua" />
- 	<Script file="Localization_frFR.lua" />
-	<Script file="MasterTradeSkills.lua" />
-
-	<Frame name="MasterTradeSkillsFrame" parent="GameTooltip" hidden="false">
-		<Scripts>
-			<OnLoad>
-				MasterTradeSkills_OnLoad();
-			</OnLoad>
-			<OnEvent>
-				MasterTradeSkills_OnEvent(event);
-			</OnEvent>
-			<OnShow>
-				MasterTradeSkills_OnShow();
-			</OnShow>
-		</Scripts>
-	</Frame>
-
 	<Frame name="MTS_OptionsFrame" enableMouse="true" movable="true" parent="UIParent" hidden="true" inherits="DialogBoxFrame">
 		<Size>
 			<AbsDimension x="400" y="475"/>
@@ -29,7 +10,6 @@
  				</Offset>
 			</Anchor>
 		</Anchors>
-
 		<Layers>
 			<Layer level="ARTWORK">
 				<Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
@@ -280,10 +260,8 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-
 			</Layer>
 		</Layers>
-
 		<Frames>
 			<CheckButton name="$parentCheck_Enabled" inherits="OptionsCheckButtonTemplate" checked="true">
 				<Anchors>
@@ -626,12 +604,7 @@
 					</OnClick>
 				</Scripts>
 			</CheckButton>
-
-
-
-
 		</Frames>
-
 		<Scripts>
 			<OnMouseUp>
 				if ( this.isMoving ) then
@@ -652,7 +625,5 @@
 				end
 			</OnHide>
 		</Scripts>
-
-
 	</Frame>
 </Ui>

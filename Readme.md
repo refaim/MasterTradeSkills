@@ -1,6 +1,6 @@
 ### Addon copied from https://www.curseforge.com/wow/addons/project-2618
 
-### Addon needs [ReagentData](https://github.com/refaim/ReagentData-vanilla) addon to work correctly
+### Addon needs [ReagentData](https://github.com/refaim/ReagentData) addon to work correctly
 
 # Description
 This addon is an information tool for all you trade skill loving fools! It will alter the tooltips of ingredients and tells you the following things:
