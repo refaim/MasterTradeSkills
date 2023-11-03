@@ -40,30 +40,31 @@ local function GetSortedTradeSkillsOptionsTable(db)
     return options
 end
 
+---@param L MasterTradeSkillsLocale
 ---@param db MasterTradeSkillsDBOptions
 ---@return LibAceConfigOptionsTable
-local function MakeOptionsTable(db)
+local function MakeOptionsTable(L, db)
     local trade_skills_options_table = GetSortedTradeSkillsOptionsTable(db)
     return {
         type = "group",
-        name = MTS_TITLE,
+        name = format("%s v%s", MTS_NAME, MTS_VERSION),
         args = {
             Enable = {
                 order = 0,
                 type = "group",
-                name = "Enable", -- TODO rename
+                name = L.txt_option_group_enable,
                 args = {
                     EnhanceTooltips = {
                         order = 0,
                         type = "toggle",
-                        name = "Enhance tooltips", -- TODO translate
+                        name = L.txt_option_enhance_tooltips,
                         get = function(info) return db.EnhanceTooltips end,
                         set = function(info, value) db.EnhanceTooltips = value end,
                     },
                     EnhanceTooltipsOnlyWhileShiftIsPressed = {
                         order = 1,
                         type = "toggle",
-                        name = "Enhance tooltips only while Shift is pressed", -- TODO translate
+                        name = L.txt_option_enhance_tooltips_shift,
                         width = "full",
                         get = function(info) return db.EnhanceTooltipsOnlyWhileShiftIsPressed end,
                         set = function(info, value) db.EnhanceTooltipsOnlyWhileShiftIsPressed = value end,
@@ -71,7 +72,7 @@ local function MakeOptionsTable(db)
                     EnhanceMinimapNodesTooltips = {
                         order = 2,
                         type = "toggle",
-                        name = "Enhance minimap nodes tooltips", -- TODO translate
+                        name = L.txt_option_enhance_minimap_nodes_tooltips,
                         width = "full",
                         get = function(info) return db.EnhanceMinimapNodesTooltips end,
                         set = function(info, value) db.EnhanceMinimapNodesTooltips = value end,
@@ -81,46 +82,46 @@ local function MakeOptionsTable(db)
             TradeSkills = {
                 order = 1,
                 type = "group",
-                name = "Trade Skills", -- TODO translate
+                name = L.txt_option_group_trade_skills,
                 args = trade_skills_options_table,
             },
             Difficulty = {
                 order = 2,
                 type = "group",
-                name = "Skill Difficulty", -- TODO translate
+                name = L.txt_option_group_skill_difficulty,
                 args = {
                     Trivial = {
                         order = 0,
                         type = "toggle",
-                        name = MTS_DIF1,
+                        name = L.txt_option_show_trivial,
                         get = function(info) return db.ShowSkillsByDifficulty.Trivial end,
                         set = function(info, value) db.ShowSkillsByDifficulty.Trivial = value end,
                     },
                     Easy = {
                         order = 1,
                         type = "toggle",
-                        name = MTS_DIF2,
+                        name = L.txt_option_show_easy,
                         get = function(info) return db.ShowSkillsByDifficulty.Easy end,
                         set = function(info, value) db.ShowSkillsByDifficulty.Easy = value end,
                     },
                     Medium = {
                         order = 2,
                         type = "toggle",
-                        name = MTS_DIF3,
+                        name = L.txt_option_show_medium,
                         get = function(info) return db.ShowSkillsByDifficulty.Medium end,
                         set = function(info, value) db.ShowSkillsByDifficulty.Medium = value end,
                     },
                     Optimal = {
                         order = 3,
                         type = "toggle",
-                        name = MTS_DIF4,
+                        name = L.txt_option_show_optimal,
                         get = function(info) return db.ShowSkillsByDifficulty.Optimal end,
                         set = function(info, value) db.ShowSkillsByDifficulty.Optimal = value end,
                     },
                     Difficult = {
                         order = 4,
                         type = "toggle",
-                        name = MTS_DIF5,
+                        name = L.txt_option_show_difficult,
                         get = function(info) return db.ShowSkillsByDifficulty.Difficult end,
                         set = function(info, value) db.ShowSkillsByDifficulty.Difficult = value end,
                     },
@@ -129,12 +130,12 @@ local function MakeOptionsTable(db)
             Details = {
                 order = 3,
                 type = "group",
-                name = "Details", -- TODO translate
+                name = L.txt_option_group_details,
                 args = {
                     ShowLearnedSkills = {
                         order = 0,
                         type = "toggle",
-                        name = MTS_OPT_SHOWLEARNED, -- TODO skills, not recipes
+                        name = L.txt_option_show_learned,
                         get = function(info) return db.ShowSkillsByStatus.Learned end,
                         set = function(info, value) db.ShowSkillsByStatus.Learned = value end,
                     },
@@ -142,21 +143,21 @@ local function MakeOptionsTable(db)
                         order = 1,
                         type = "toggle",
                         width = "full",
-                        name = MTS_OPT_SHOWNOTLEARNED, -- TODO skills, not recipes
+                        name = L.txt_option_show_not_learned,
                         get = function(info) return db.ShowSkillsByStatus.NotLearned end,
                         set = function(info, value) db.ShowSkillsByStatus.NotLearned = value end,
                     },
                     ShowAltName = {
                         order = 3,
                         type = "toggle",
-                        name = MTS_OPT_ALTNAME,
+                        name = L.txt_option_show_alt_name,
                         get = function(info) return db.ShowAltName end,
                         set = function(info, value) db.ShowAltName = value end,
                     },
                     HowManySkillsToShow = {
                         order = 4,
                         type = "range",
-                        name = "How many skills to show in the tooltip", -- TODO translate
+                        name = L.txt_option_how_many_skills_to_show,
                         width = "full",
                         min = 0,
                         max = 100,
@@ -170,19 +171,19 @@ local function MakeOptionsTable(db)
             Sorting = {
                 order = 4,
                 type = "group",
-                name = "Sorting",
+                name = L.txt_option_group_sorting,
                 args = {
                     HigherLevelSkillsFirst = {
                         order = 0,
                         type = "toggle",
-                        name = "Higher level skills first", -- TODO translate
+                        name = L.txt_option_higher_level_skills_first,
                         get = function(info) return db.SortingOptions.HigherLevelSkillsFirst end,
                         set = function(info, value) db.SortingOptions.HigherLevelSkillsFirst = value end,
                     },
                     NotLearnedSkillsLast = {
                         order = 0,
                         type = "toggle",
-                        name = "Not learned skills last", -- TODO translate
+                        name = L.txt_option_not_learned_skills_last,
                         get = function(info) return db.SortingOptions.NotLearnedSkillsLast end,
                         set = function(info, value) db.SortingOptions.NotLearnedSkillsLast = value end,
                     },
@@ -190,7 +191,7 @@ local function MakeOptionsTable(db)
             },
             Options = {
                 type = "execute",
-                name = "Open options", -- TODO translate
+                name = L.txt_open_options,
                 guiHidden = true,
                 func = function()
                     MasterTradeSkills_Options:OpenDialog()
@@ -208,11 +209,12 @@ local function SupportClosingWithEscape(app_name, frame)
     tinsert(UISpecialFrames, name)
 end
 
+---@param L MasterTradeSkillsLocale
 ---@param application string
 ---@param database MasterTradeSkillsDBOptions
 ---@param AceConfig LibAceConfigEmbedDef
-function MasterTradeSkills_Options:Initialize(application, database, AceConfig)
-    AceConfig:RegisterOptionsTable(application, MakeOptionsTable(database), "mts")
+function MasterTradeSkills_Options:Initialize(L, application, database, AceConfig)
+    AceConfig:RegisterOptionsTable(application, MakeOptionsTable(L, database), "mts")
     AceConfigDialog:AddToBlizOptions(application)
     self.__application = application
 

@@ -19,10 +19,12 @@ lib\AceGUI-3.0\AceGUI-3.0.xml
 lib\AceConsole-3.0\AceConsole-3.0.xml
 lib\AceConfig-3.0\AceConfig-3.0.xml
 
+src\GlobalVariables.lua
+src\Utils.lua
 src\locale\enUS.lua
 src\locale\deDE.lua
 src\locale\frFR.lua
-src\Utils.lua
+src\locale\ruRU.lua
 src\database\Legacy.lua
 src\database\Modern.lua
 src\Options.lua

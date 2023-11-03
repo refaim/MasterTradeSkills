@@ -22,14 +22,29 @@ local LibStub = getglobal("LibStub")
 assert(LibStub ~= nil, "Cannot find instance of a LibStub")
 
 ---@type LibAceAddonDef
-local LibAceAddon = --[[---@type LibAceAddonDef]] LibStub("AceAddon-3.0")
-
-local ADDON_NAME = "MasterTradeSkills"
+local AceAddon = --[[---@type LibAceAddonDef]] LibStub("AceAddon-3.0")
 
 ---@type AceAddonDef
 ---@field database MasterTradeSkillsDB
 ---@field options MasterTradeSkillsDBOptions
-local MasterTradeSkills = LibAceAddon:NewAddon(ADDON_NAME, "AceConfig-3.0", "AceEvent-3.0", "AceHook-3.0")
+local MasterTradeSkills = AceAddon:NewAddon(MTS_NAME, "AceConfig-3.0", "AceEvent-3.0", "AceHook-3.0")
+
+local AceLocale = --[[---@type LibAceLocaleDef]] LibStub("AceLocale-3.0")
+local L = --[[---@type MasterTradeSkillsLocale]] AceLocale:GetLocale(MTS_NAME, false)
+local LR = --[[---@type table<string, string>]] L
+
+MTS_TRADESKILLS = {
+    [1] = L.txt_trade_skill_cooking,
+    [2] = L.txt_trade_skill_tailoring,
+    [3] = L.txt_trade_skill_enchanting,
+    [4] = L.txt_trade_skill_leatherworking,
+    [5] = L.txt_trade_skill_blacksmithing,
+    [6] = L.txt_trade_skill_alchemy,
+    [7] = L.txt_trade_skill_engineering,
+    [8] = L.txt_trade_skill_first_aid,
+    [9] = L.txt_trade_skill_mining,
+    [10] = L.txt_trade_skill_poisons,
+};
 
 ---@return LibAceConfigEmbedDef
 function MasterTradeSkills:AceConfig()
@@ -50,7 +65,7 @@ end
 function MasterTradeSkills:OnInitialize()
     self.database = MasterTradeSkills_Database:Initialize(LibStub)
     self.options = self.database.char.Options
-    MasterTradeSkills_Options:Initialize(ADDON_NAME, self.options, self:AceConfig())
+    MasterTradeSkills_Options:Initialize(L, MTS_NAME, self.options, self:AceConfig())
 end
 
 function MasterTradeSkills:OnEnable()
@@ -104,16 +119,7 @@ function MasterTradeSkills:OnEnable()
     self:AceHook():SecureHook("SetItemRef", "PostHookSetItemRef")
     self:AceHook():HookScript(GameTooltip, "OnShow", "PreHookGameTooltipShow")
 
-    -- TODO use AceLocale
-    if (GetLocale() == "deDE") then
-        MasterTradeSkills_LoadGerman();
-    elseif (GetLocale() == "frFR") then
-        MasterTradeSkills_LoadFrench();
-    elseif (GetLocale() == "ruRU") then
-        MasterTradeSkills_LoadRussian()
-    end
-
-    MasterTradeSkills_Write(MTS_LOADED);
+    MasterTradeSkills_Write(L.txt_addon_loaded);
 end
 
 function MasterTradeSkills:PostHookSetItemRef(link, text, button)
@@ -252,7 +258,7 @@ function MasterTradeSkills:EnhanceTooltip(frame, name) -- TODO change signature
                         skilllevel_color = "";
                         local AltKnown = 0;
                         local AltKnownBy = "";
-                        local localeRecipes = MTS_RECIPENAME[Recipes];
+                        local localeRecipes = LR[Recipes];
                         -- First check if the data is read
                         if (MTS_DATA[value] ~= nil) then
                             -- Second check if the recipe is in the MTS database
@@ -329,18 +335,18 @@ function MasterTradeSkills:EnhanceTooltip(frame, name) -- TODO change signature
                             MTS_ShowTooltip = false;
                         end
 
-                            local localeRecipes = MTS_RECIPENAME[Recipes];
+                            local localeRecipes = LR[Recipes];
                             if (localeRecipes == nil) then
                                 localeRecipes = Recipes
-                                MasterTradeSkills_Write(MTS_UNKNOWN..Recipes);
+                                MasterTradeSkills_Write(L.txt_locale_missing, localeRecipes);
                             end
 
                             -- Source Locales
-                                if ( source == "Vendor") then source = MTS_RVENDOR;
-                                elseif ( source == "Trainer") then source = MTS_RTRAINER;
-                                elseif ( source == "Drop") then source = MTS_RDROP;
-                                elseif ( source == "Unknown") then source = MTS_RUNKNOWN;
-                                elseif ( source == "Quest") then source = MTS_RQUEST;
+                                if ( source == "Vendor") then source = L.txt_source_vendor;
+                                elseif ( source == "Trainer") then source = L.txt_source_trainer;
+                                elseif ( source == "Drop") then source = L.txt_source_drop;
+                                elseif ( source == "Unknown") then source = L.txt_source_unknown;
+                                elseif ( source == "Quest") then source = L.txt_source_quest;
                                 end
 
                             isreagent = {};
@@ -372,7 +378,7 @@ function MasterTradeSkills:EnhanceTooltip(frame, name) -- TODO change signature
                             if (count[value] == 1) then
                                 if ( MTS_ShowTooltip == true ) then
                                     local color = "|cFF00FF11"
-                                    frame:AddDoubleLine(color .. MTS_RECIPES .. "|r", color .. value .. " (" .. MTS_SkillLevel .. ")|r");
+                                    frame:AddDoubleLine(color .. L.txt_recipes .. "|r", color .. value .. " (" .. MTS_SkillLevel .. ")|r");
                                 end
                             end
 

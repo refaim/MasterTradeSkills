@@ -32,7 +32,7 @@ MasterTradeSkills_Database = {}
 
 ---@param LibStub LibStubDef
 ---@return MasterTradeSkillsDB
-function MasterTradeSkills_Database:Initialize(LibStub) -- TODO migrate old settings
+function MasterTradeSkills_Database:Initialize(LibStub)
     ---@type table<ProfessionId, boolean>
     local show_skills_by_trade_skill = {}
     for _, trade_skill in ipairs(self:GetTradeSkills()) do

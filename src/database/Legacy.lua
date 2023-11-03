@@ -39,8 +39,12 @@ function MasterTradeSkills_LegacyDatabase:ImportOptions(defaults)
     local player
     ---@type MasterTradeSkillsLegacyDB
     local database = getglobal("MTS_DATA")
+    if type(database) ~= "table" then
+        return nil
+    end
+
     for _, character in ipairs(database.Characters or {}) do
-        if character.Name == name and character.Realm == realm and (character.Faction == faction or faction == nil) then
+        if type(character) == "table" and character.Name == name and character.Realm == realm and (character.Faction == faction or faction == nil) then
             player = character
             break
         end
@@ -50,7 +54,7 @@ function MasterTradeSkills_LegacyDatabase:ImportOptions(defaults)
     end
 
     local ldb = player.Options
-    if ldb == nil or type(ldb) ~= "table" or MasterTradeSkills_Utils:IsTableEmpty(ldb) then
+    if type(ldb) ~= "table" or MasterTradeSkills_Utils:IsTableEmpty(ldb) then
         return nil
     end
 
