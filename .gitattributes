@@ -1,2 +1,2 @@
-/lib/*/*.lua binary
-/lib/*/*.xml binary
+/lib/**/*.lua binary
+/lib/**/*.xml binary

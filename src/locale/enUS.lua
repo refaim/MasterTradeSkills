@@ -2,9 +2,7 @@
 MTS_NAME = "MasterTradeSkills";
 MTS_VERSION = "1.12.4";
 MTS_RELEASE = "November 1, 2023";
-MTS_TITLE = MTS_NAME .. " - v" .. MTS_VERSION;
-MTS_DATA_VERSION = "1";
-BINDING_HEADER_MTS_SEP    = "Master Trade Skills";
+MTS_TITLE = MTS_NAME .. " v" .. MTS_VERSION;
 
 -- non Localised vales
 MTS_TRADESKILLS_NAME = {
@@ -20,21 +18,22 @@ MTS_TRADESKILLS_NAME = {
     [10] = "poisons";
 };
 
+---@type table<number, ProfessionId>
+MTS_TSD_PROFESSION_ID = {
+    [1] = "Cooking";
+    [2] = "Tailoring";
+    [3] = "Enchanting";
+    [4] = "Leatherworking";
+    [5] = "Blacksmithing";
+    [6] = "Alchemy";
+    [7] = "Engineering";
+    [8] = "First Aid";
+    [9] = "Mining";
+    [10] = "Poisons";
+}
 
 -- Messages That Are Localized Below Here
 MTS_LOADED = "Master Trade Skills v".. MTS_VERSION .. " AddOn loaded";
-MTS_HELP = {
-    [1] = "|cFFFF0000MasterTradeSkills commands:|r";
-    [2] = "/MTS On : Turn MasterTradeSkills on";
-    [3] = "/MTS Off : Turn MasterTradeSkills on";
-    [4] = "/MTS Toggle : Toggle between on and off";
-    [5] = "/MTS Options : Show the options dialog";
-};
-MTS_WRONGSLASH = "For help type \"/MasterTradeSkills help\"";
-MTS_ENABLED = "MasterTradeSkills is enabled";
-MTS_DISABLED = "MasterTradeSkills is disabled";
-BINDING_NAME_MTS_TEXT    = "Configure Options";
-BINDING_NAME_MTS_SHOW    = "Show Recipe List";
 
 -- Global Variables
 MTS_RECIPES = "Recipes";
@@ -60,11 +59,11 @@ MTS_TRADESKILL_SKILLLEVEL = {
     [5] = "unknown";
 };
 
-MTS_DIF1 = "Show |cFFA0A0A0[ Trivial ]";
-MTS_DIF2 = "Show |cFF40C040[ Easy ]";
-MTS_DIF3 = "Show |cFFFFEE00[ Medium ]";
-MTS_DIF4 = "Show |cFFFF9900[ Optimal ]";
-MTS_DIF5 = "Show |cFFFF0000[ Too High ]";
+MTS_DIF1 = "Show |cFFA0A0A0Trivial";
+MTS_DIF2 = "Show |cFF40C040Easy";
+MTS_DIF3 = "Show |cFFFFEE00Medium";
+MTS_DIF4 = "Show |cFFFF9900Optimal";
+MTS_DIF5 = "Show |cFFFF0000Difficult";
 MTS_REVERSE = "Higher Level Recipes First";
 
 MTS_OPT_ENABLE = "Enable " .. MTS_NAME;

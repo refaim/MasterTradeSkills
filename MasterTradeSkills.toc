@@ -1,21 +1,29 @@
 ## Interface: 11200
 ## Title: MasterTradeSkills
 ## Notes: This AddOn adjusts the display of the tooltips to show which recipe is being used by the item your hovering above
-## Author: DaDaemon, Triadian (triadian@gmail.com), Refaim
+## Author: DaDaemon, Triadian, Farook, Refaim
 ## Version: 1.12.4
-## Dependencies: ReagentData
-## SavedVariables: MTS_DATA
+## Dependencies: ReagentData, TradeSkillsData
+## OptionalDeps: TradeSkillsData-turtle
+## SavedVariables: MTS_DATA, MasterTradeSkillsData
 
 lib\LibStub\LibStub.lua
 lib\CallbackHandler-1.0\CallbackHandler-1.0.xml
 lib\AceCore-3.0\AceCore-3.0.xml
+lib\AceLocale-3.0\AceLocale-3.0.xml
+lib\AceDB-3.0\AceDB-3.0.xml
 lib\AceHook-3.0\AceHook-3.0.xml
 lib\AceEvent-3.0\AceEvent-3.0.xml
 lib\AceAddon-3.0\AceAddon-3.0.xml
+lib\AceGUI-3.0\AceGUI-3.0.xml
+lib\AceConsole-3.0\AceConsole-3.0.xml
+lib\AceConfig-3.0\AceConfig-3.0.xml
 
 src\locale\enUS.lua
 src\locale\deDE.lua
 src\locale\frFR.lua
+src\Utils.lua
+src\database\Legacy.lua
+src\database\Modern.lua
+src\Options.lua
 src\Addon.lua
-
-src\ui\options.xml

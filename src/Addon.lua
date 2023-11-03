@@ -1,19 +1,19 @@
+-- TODO setfenv
+
 -- Database, inspired by BookOfCrafts
 --[[
-    .Version                   : Data version
     .Characters                : Indexed table of characters
        [i]                     : Acces to i-th character
           .Name                : Character name
           .Realm               : Character realm
           .Faction             : Character faction
-        .Options               : All configuration options (save per character)
     [tradeskill]               : Contains all known craft objects for "tradeskill" (tailor, alchemy, ...)
        [crafted_object]        : Data for specific "crafted_object"
           .LearntBy[i]         : index in ".Characters" of i-th character who knows this tradeskills
 ]]--
+-- TODO remove this global variables
+---@type MasterTradeSkillsLegacyDB
 MTS_DATA = {};
-
-MTS_VARIABLES_LOADED = false;
 MTS_PLAYER_NAME_KNOWN = false;
 MTS_DATA_CHECKED = false;
 
@@ -22,10 +22,19 @@ local LibStub = getglobal("LibStub")
 assert(LibStub ~= nil, "Cannot find instance of a LibStub")
 
 ---@type LibAceAddonDef
-local LibAceAddon = --[[---@type LibAceAddonDef]] LibStub:GetLibrary("AceAddon-3.0", false)
+local LibAceAddon = --[[---@type LibAceAddonDef]] LibStub("AceAddon-3.0")
+
+local ADDON_NAME = "MasterTradeSkills"
 
 ---@type AceAddonDef
-local MasterTradeSkills = LibAceAddon:NewAddon("MasterTradeSkills", "AceEvent-3.0", "AceHook-3.0")
+---@field database MasterTradeSkillsDB
+---@field options MasterTradeSkillsDBOptions
+local MasterTradeSkills = LibAceAddon:NewAddon(ADDON_NAME, "AceConfig-3.0", "AceEvent-3.0", "AceHook-3.0")
+
+---@return LibAceConfigEmbedDef
+function MasterTradeSkills:AceConfig()
+    return --[[---@type LibAceConfigEmbedDef]] self
+end
 
 ---@return LibAceEventEmbedDef
 function MasterTradeSkills:AceEvent()
@@ -37,46 +46,11 @@ function MasterTradeSkills:AceHook()
     return --[[---@type LibAceHookEmbedDef]] self
 end
 
-local function HookGameTooltipShow()
-    if not MTS_PLAYER_NAME_KNOWN or not MTS_VARIABLES_LOADED or not MTS_DATA_CHECKED then
-        return
-    end
-
-    local options = MTS_DATA.Characters[MTS_CHAR_INDEX].Options
-    local enabled = options.MTS_STATE == 1 and (options.MTS_SHOWONSHIFTKEYDOWN == 0 or IsShiftKeyDown()) and (options.MTS_MOUSEOVER == 0 or not MouseIsOver(MinimapCluster))
-    if not enabled then
-        return
-    end
-
-    local lbl = getglobal("GameTooltipTextLeft1");
-    if lbl then
-        local name = lbl:GetText();
-        name = string.gsub(name, "Vein","Ore");
-        name = string.gsub(name, "Deposit","Ore");
-        if ( strfind(name,"Ore") ~= nil ) then
-            name = string.gsub(name, "Rich ","");
-            name = string.gsub(name, "Small ","");
-            name = string.gsub(name, "Ooze Covered ","");
-        end
-        MasterTradeSkills_CheckTooltipInfo(GameTooltip, name);
-    end
-end
-
-local function HookSetItemRef(link, text, button)
-    local prefix_supported = strsub(link, 1, strlen("item")) == "item"
-    if prefix_supported and not IsControlKeyDown() and not IsShiftKeyDown() then
-        local name, _, _, _, _, _, _, _, _ = GetItemInfo(link);
-        MasterTradeSkills_CheckTooltipInfo(ItemRefTooltip, name)
-        ItemRefTooltip:Show()
-    end
-end
-
+-- TODO keybindings for the options window
 function MasterTradeSkills:OnInitialize()
-    ---@type table<string, any>
-    local G = getfenv(0)
-    G["SLASH_MasterTradeSkills1"] = "/MasterTradeSkills";
-    G["SLASH_MasterTradeSkills2"] = "/mts";
-    SlashCmdList["MasterTradeSkills"] = MasterTradeSkills_Command;
+    self.database = MasterTradeSkills_Database:Initialize(LibStub)
+    self.options = self.database.char.Options
+    MasterTradeSkills_Options:Initialize(ADDON_NAME, self.options, self:AceConfig())
 end
 
 function MasterTradeSkills:OnEnable()
@@ -127,9 +101,10 @@ function MasterTradeSkills:OnEnable()
         end
     end)
 
-    self:AceHook():HookScript(GameTooltip, "OnShow", HookGameTooltipShow)
-    self:AceHook():SecureHook("SetItemRef", HookSetItemRef)
+    self:AceHook():SecureHook("SetItemRef", "PostHookSetItemRef")
+    self:AceHook():HookScript(GameTooltip, "OnShow", "PreHookGameTooltipShow")
 
+    -- TODO use AceLocale
     if (GetLocale() == "deDE") then
         MasterTradeSkills_LoadGerman();
         ReagentData_LoadGerman();
@@ -138,26 +113,54 @@ function MasterTradeSkills:OnEnable()
         ReagentData_LoadFrench();
     end
 
-    MTS_VARIABLES_LOADED = true -- TODO replace by AceDB or smth and dont rely on game
-
     MasterTradeSkills_Write(MTS_LOADED);
 end
 
+function MasterTradeSkills:PostHookSetItemRef(link, text, button)
+    local prefix_supported = strsub(link, 1, strlen("item")) == "item"
+    if prefix_supported and not IsControlKeyDown() and not IsShiftKeyDown() then
+        local name, _, _, _, _, _, _, _, _ = GetItemInfo(link);
+        self:EnhanceTooltip(ItemRefTooltip, name)
+        ItemRefTooltip:Show()
+    end
+end
+
+function MasterTradeSkills:PreHookGameTooltipShow()
+    if not MTS_PLAYER_NAME_KNOWN or not MTS_DATA_CHECKED then
+        return
+    end
+
+    local enabled = self.options.EnhanceTooltips
+        and (IsShiftKeyDown() or not self.options.EnhanceTooltipsOnlyWhileShiftIsPressed)
+        and (self.options.EnhanceMinimapNodesTooltips or not MouseIsOver(MinimapCluster))
+    if not enabled then
+        return
+    end
+
+    -- TODO refactor
+    local lbl = getglobal("GameTooltipTextLeft1");
+    if lbl then
+        local name = lbl:GetText();
+        name = string.gsub(name, "Vein","Ore");
+        name = string.gsub(name, "Deposit","Ore");
+        if ( strfind(name,"Ore") ~= nil ) then
+            name = string.gsub(name, "Rich ","");
+            name = string.gsub(name, "Small ","");
+            name = string.gsub(name, "Ooze Covered ","");
+        end
+        self:EnhanceTooltip(GameTooltip, name);
+    end
+end
+
 function MasterTradeSkills_InitData()
-    if((MTS_PLAYER_NAME_KNOWN) and (MTS_VARIABLES_LOADED) and (not MTS_DATA_CHECKED) ) then
+    if((MTS_PLAYER_NAME_KNOWN) and (not MTS_DATA_CHECKED) ) then
         MTS_CHAR_NAME    = UnitName( "player" )
         MTS_CHAR_REALM   = GetCVar( "realmName" )
         MTS_CHAR_FACTION = UnitFactionGroup( "player" )
 
-        if(not MTS_DATA.Version) then
-            MTS_DATA.Version = 0;
-        end
-
         if( not MTS_DATA.Characters ) then
             MTS_DATA.Characters = {};
         end
-
-        MTS_DATA.Version = MTS_DATA_VERSION;
 
         -- Find character name
         local nb_chars = table.getn( MTS_DATA.Characters );
@@ -179,138 +182,13 @@ function MasterTradeSkills_InitData()
             MTS_DATA.Characters[MTS_CHAR_INDEX].Name    = MTS_CHAR_NAME;
             MTS_DATA.Characters[MTS_CHAR_INDEX].Realm   = MTS_CHAR_REALM;
             MTS_DATA.Characters[MTS_CHAR_INDEX].Faction = MTS_CHAR_FACTION;
-
-            if(not MTS_DATA.Characters[MTS_CHAR_INDEX].Options) then
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options = {};
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE = 1;
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN = 0;
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWLEARNED = 1;
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWNOTLEARNED = 1;
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOW_TRADESKILLS = {};
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_NUMTOSHOW = 10;
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWREV = 1;
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF1 = 1;
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF2 = 1;
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF3 = 1;
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF4 = 1;
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF5 = 1;
-                for i = 1, table.getn(MTS_TRADESKILLS) do
-                    MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOW_TRADESKILLS[i] = 1;
-                end
-
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_MAIN_COLOR = "|cFF00FF11";
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_RECIPE_COLOR = "|cFFFFB444";
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_SOURCE_COLOR = "|cFF56B59D";
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_SKILL_COLOR_LEARNABLE = "|cFF00FF00";
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_SKILL_COLOR_UNLEARNABLE = "|cFFFF0000";
-                MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_TRADESKILL_SKILLLEVEL_COLOR = {
-                    [1] = "|cFFA0A0A0";
-                    [2] = "|cFF40C040";
-                    [3] = "|cFFFFEE00";
-                    [4] = "|cFFFF9900";
-                    [5] = "|cFFFF0000";
-                };
-
-
-            end
-        end
-        if (not MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN ) then MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN = 0; end
-        if (not MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_NUMTOSHOW ) then MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_NUMTOSHOW = 10; end
-        if (not MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWREV ) then MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWREV = 1; end
-        if (not MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF1 ) then MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF1 = 1; end
-        if (not MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF2 ) then MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF2 = 1; end
-        if (not MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF3 ) then MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF3 = 1; end
-        if (not MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF4 ) then MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF4 = 1; end
-        if (not MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF5 ) then MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF5 = 1; end
-        if (not MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_UNKNOWNTOBOTTOM ) then MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_UNKNOWNTOBOTTOM = 1; end
-        if (not MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_ALTNAME ) then MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_ALTNAME = 1; end
-        if (not MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_MOUSEOVER ) then MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_MOUSEOVER = 1; end
-
-        -- Initialize the options panel
-        MTS_OptionsFrameCheck_Enabled:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE);
-        MTS_OptionsFrameCheck_ShowOnShiftKeyDown:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN);
-        MTS_OptionsFrameCheck_ShowLearned:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWLEARNED);
-        MTS_OptionsFrameCheck_ShowNotLearned:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWNOTLEARNED);
-        MTS_OptionsFrameCheck_Show_Dif1:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF1);
-        MTS_OptionsFrameCheck_Show_Dif2:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF2);
-        MTS_OptionsFrameCheck_Show_Dif3:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF3);
-        MTS_OptionsFrameCheck_Show_Dif4:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF4);
-        MTS_OptionsFrameCheck_Show_Dif5:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF5);
-        MTS_OptionsFrameCheck_ReverseOrder:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWREV);
-        MTS_OptionsFrameCheck_UnknownToBot:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_UNKNOWNTOBOTTOM);
-        MTS_OptionsFrameCheck_AltName:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_ALTNAME);
-        MTS_OptionsFrameCheck_NoMinimap:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_MOUSEOVER);
-
-
-        MTS_OptionsFrameText_ShowNumToShow:SetNumber(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_NUMTOSHOW);
-        for i = 1, table.getn(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOW_TRADESKILLS) do
-            getglobal("MTS_OptionsFrameCheck_ShowTradeSkills" .. i):SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOW_TRADESKILLS[i]);
-        end
-
-        -- Make the optionspanel right (fill in the right text)
-        for i = 1, table.getn(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOW_TRADESKILLS) do
-            getglobal("MTS_OptionsFrameText_ShowTradeSkills" .. i):SetText(MTS_TRADESKILLS[i]);
         end
 
         MTS_DATA_CHECKED = true;
     end
 end
 
-function MTS_NumToShow()
-    MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_NUMTOSHOW = MTS_OptionsFrameText_ShowNumToShow:GetNumber();
-end
-
-function MTS_Options_ToggleShowRev()
-    MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWREV = MTS_OptionsFrameCheck_ReverseOrder:GetChecked();
-end
-
-function MTS_Options_ToggleShowDif(dif)
-     if ( dif == 1 ) then
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF1 = MTS_OptionsFrameCheck_Show_Dif1:GetChecked();
-    elseif ( dif == 2 ) then
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF2 = MTS_OptionsFrameCheck_Show_Dif2:GetChecked();
-    elseif ( dif == 3 ) then
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF3 = MTS_OptionsFrameCheck_Show_Dif3:GetChecked();
-    elseif ( dif == 4 ) then
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF4 = MTS_OptionsFrameCheck_Show_Dif4:GetChecked();
-    elseif ( dif == 5 ) then
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF5 = MTS_OptionsFrameCheck_Show_Dif5:GetChecked();
-    end
-end
-
-function  MasterTradeSkills_Command(msg)
-    msg = string.lower(msg)
-    if(msg == "help") then
-        local MTS_HelpNr = table.getn(MTS_HELP);
-        for i=1,MTS_HelpNr do
-            MasterTradeSkills_Write(MTS_HELP[i]);
-        end
-    elseif(msg == "off") then
-        if (MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE == 1) then
-            MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE = 0;
-        MTS_OptionsFrameCheck_Enabled:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE);
-            MasterTradeSkills_Write(MTS_DISABLED);
-        end
-    elseif(msg == "on") then
-        if (MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE == 0) then
-            MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE = 1;
-        MTS_OptionsFrameCheck_Enabled:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE);
-            MasterTradeSkills_Write(MTS_ENABLED);
-        end
-    elseif(msg == "toggle") then
-        MTS_Options_Toggle();
-    elseif(msg == "options") then
-        if (MTS_OptionsFrame:IsVisible()) then
-            MTS_OptionsFrame:Hide();
-        else
-            MTS_OptionsFrame:Show();
-        end
-    else
-        MasterTradeSkills_Write(MTS_WRONGSLASH)
-    end
-end
-
-function MasterTradeSkills_CheckTooltipInfo(frame, name)
+function MasterTradeSkills:EnhanceTooltip(frame, name) -- TODO change signature
     local professions = ReagentData_GetProfessions(name);
     local totalcount = 0;
     -- text will hold the recipes to be written to the frame.
@@ -326,33 +204,43 @@ function MasterTradeSkills_CheckTooltipInfo(frame, name)
         count[MTS_TRADESKILLS[i]] = 0;
     end
 
-
     local endsource = 0;
     local skilllevel_color = "";
-    local Recipes = "";
-    local Reagents = "";
     -- Make a new database for the tooltip
     local MTS_TOOLTIP_DB = {};
     local MTS_TOOLTIP_SKILLEVEL = 0;
-    local MTS_IS_TRADESKILL = 0;
+
+    local recipe_source_color = "|cFF56B59D"
+    local learnable_color = "|cFF00FF00"
+    local unlearnable_color = "|cFFFF0000"
+    ---@type table<number, string>
+    local skill_level_to_color = {
+        [1] = "|cFFA0A0A0";
+        [2] = "|cFF40C040";
+        [3] = "|cFFFFEE00";
+        [4] = "|cFFFF9900";
+        [5] = "|cFFFF0000";
+    };
+
     if ( professions == nil ) then return end
+
     -- Loop through the professions and recipes
     for key, value in professions do
-        MTS_IS_TRADESKILL = MasterTradeSkill_IsTradeSkill(value);
-        if (MTS_IS_TRADESKILL ~= 0 and MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOW_TRADESKILLS[MTS_IS_TRADESKILL] ~= 0) then
-             local MTS_TradeSkill = MTS_TRADESKILLS_NAME[MTS_IS_TRADESKILL];
-
+        local trade_skill_index = MasterTradeSkill_IsTradeSkill(value)
+        local rd_trade_skill_id = MTS_TRADESKILLS_NAME[trade_skill_index]
+        local tsd_profession_id = MTS_TSD_PROFESSION_ID[trade_skill_index]
+        if (rd_trade_skill_id ~= nil and tsd_profession_id ~= nil and self.options.ShowSkillsByTradeSkill[tsd_profession_id]) then
             -- Clear Tooltip Database
             MTS_TOOLTIP_DB = {};
-            for Recipes in ReagentData['crafted'][MTS_TradeSkill] do
-                for Reagents in ReagentData['crafted'][MTS_TradeSkill][Recipes]['reagents'] do
+            for Recipes in ReagentData['crafted'][rd_trade_skill_id] do
+                for Reagents in ReagentData['crafted'][rd_trade_skill_id][Recipes]['reagents'] do
                     if (name == Reagents) then
                         local MTS_SkillLevel = MasterTradeSkills_GetSkillLevel(value);
                         textleft = "";
                         textright = "";
                         -- Get the skill level and source of the recipe
-                        skill = ReagentData['crafted'][MTS_TradeSkill][Recipes]['skill'];
-                        source = ReagentData['crafted'][MTS_TradeSkill][Recipes]['source'];
+                        skill = ReagentData['crafted'][rd_trade_skill_id][Recipes]['skill'];
+                        source = ReagentData['crafted'][rd_trade_skill_id][Recipes]['source'];
                         -- Filter out the source
                         endsource = string.find(source, ":");
                         if (endsource ~= nil) then
@@ -376,7 +264,7 @@ function MasterTradeSkills_CheckTooltipInfo(frame, name)
                                     if (MTS_DATA[value][localeRecipes].LearntBy[MTS_CHAR_INDEX] ~= nil) then
                                         for i=1,4 do
                                             if (MTS_DATA[value][localeRecipes].LearntBy[MTS_CHAR_INDEX] == MTS_TRADESKILL_SKILLLEVEL[i]) then
-                                                skilllevel_color = MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_TRADESKILL_SKILLLEVEL_COLOR[i];
+                                                skilllevel_color = skill_level_to_color[i];
                                                 AltKnown = 0
                                             end
                                         end
@@ -386,7 +274,7 @@ function MasterTradeSkills_CheckTooltipInfo(frame, name)
                                             if (MTS_DATA[value][localeRecipes].LearntBy[i] ~= nil ) then
                                                     for q=1,4 do
                                                         if (MTS_DATA[value][localeRecipes].LearntBy[i] == MTS_TRADESKILL_SKILLLEVEL[q]) then
-                                                            Altskilllevel_color = MTS_DATA.Characters[i].Options.MTS_TRADESKILL_SKILLLEVEL_COLOR[q];
+                                                            Altskilllevel_color = skill_level_to_color[q];
                                                         end
                                                     end
                                                 if ( MTS_DATA.Characters[i].Realm == MTS_DATA.Characters[MTS_CHAR_INDEX].Realm and MTS_DATA.Characters[i].Faction == MTS_DATA.Characters[MTS_CHAR_INDEX].Faction) then
@@ -400,44 +288,44 @@ function MasterTradeSkills_CheckTooltipInfo(frame, name)
                         end
                         if (skilllevel_color == ""  ) then
                             if ( AltKnownBy ~= "") then
-                                skilllevel_color = MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_SOURCE_COLOR;
+                                skilllevel_color = recipe_source_color;
                             else
-                                skilllevel_color = MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_TRADESKILL_SKILLLEVEL_COLOR[5];
+                                skilllevel_color = skill_level_to_color[5];
                             end
                         end
                         -- Make the texts for in the tooltip
                         local MTS_ShowTooltip = true;
                         -- Options: Show Learned
-                        if (skilllevel_color ~= MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_TRADESKILL_SKILLLEVEL_COLOR[5] and MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWLEARNED == 0) then
+                        if (skilllevel_color ~= skill_level_to_color[5] and not self.options.ShowSkillsByStatus.Learned) then
                             MTS_ShowTooltip = false;
                         end
                         -- Options: Show Not Learned
-                        if (skilllevel_color == MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_TRADESKILL_SKILLLEVEL_COLOR[5] and MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWNOTLEARNED == 0) then
+                        if (skilllevel_color == skill_level_to_color[5] and not self.options.ShowSkillsByStatus.NotLearned) then
                             MTS_ShowTooltip = false;
                         end
                         -- Options: Show Trivial
-                        if (skilllevel_color == MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_TRADESKILL_SKILLLEVEL_COLOR[1] and MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF1 == nil ) then
+                        if (skilllevel_color == skill_level_to_color[1] and not self.options.ShowSkillsByDifficulty.Trivial ) then
                             MTS_ShowTooltip = false;
                         end
                         -- Options: Show Easy
-                        if (skilllevel_color == MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_TRADESKILL_SKILLLEVEL_COLOR[2] and MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF2 == nil ) then
+                        if (skilllevel_color == skill_level_to_color[2] and not self.options.ShowSkillsByDifficulty.Easy ) then
                             MTS_ShowTooltip = false;
                         end
                         -- Options: Show Medium
-                        if (skilllevel_color == MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_TRADESKILL_SKILLLEVEL_COLOR[3] and MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF3 == nil ) then
+                        if (skilllevel_color == skill_level_to_color[3] and not self.options.ShowSkillsByDifficulty.Medium ) then
                             MTS_ShowTooltip = false;
                         end
                         -- Options: Show Optimal
-                        if (skilllevel_color == MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_TRADESKILL_SKILLLEVEL_COLOR[4] and MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF4 == nil ) then
+                        if (skilllevel_color == skill_level_to_color[4] and not self.options.ShowSkillsByDifficulty.Optimal ) then
                             MTS_ShowTooltip = false;
                         end
                         -- Options: Show Too High
-                        if (skilllevel_color == MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_TRADESKILL_SKILLLEVEL_COLOR[5] and MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWDIF5 == nil ) then
+                        if (skilllevel_color == skill_level_to_color[5] and not self.options.ShowSkillsByDifficulty.Difficult ) then
                             MTS_ShowTooltip = false;
                         end
 
                         -- Options: How Many so far Vs Number to show
-                        if ( totalcount > MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_NUMTOSHOW -1 ) then
+                        if ( totalcount + 1 > self.options.HowManySkillsToShow ) then
                             MTS_ShowTooltip = false;
                         end
 
@@ -465,36 +353,39 @@ function MasterTradeSkills_CheckTooltipInfo(frame, name)
                                 prechar = "+";
                                 end
                             end
-                            textleft = MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_RECIPE_COLOR .. " ".. prechar .."|r" .. skilllevel_color .. localeRecipes .. "|r";
-                            textright = MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_SOURCE_COLOR .. source .. "|r ";
+                            textleft = "|cFFFFB444" .. " ".. prechar .."|r" .. skilllevel_color .. localeRecipes .. "|r";
+                            textright = recipe_source_color .. source .. "|r ";
                             if (skill ~= nil and skill ~= "") then
                                 if (skill > MTS_SkillLevel) then
-                                    textright = textright .. MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_SKILL_COLOR_UNLEARNABLE .. "(" ..  skill .. ")|r";
+                                    textright = textright .. unlearnable_color .. "(" ..  skill .. ")|r";
                                 else
-                                    textright = textright .. MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_SKILL_COLOR_LEARNABLE .. "(" ..  skill .. ")|r";
+                                    textright = textright .. learnable_color .. "(" ..  skill .. ")|r";
                                 end
                             else
                                 if (skill == nil or skill == "") then
                                     skill = "?";
                                 end
-                                textright = textright .. MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_SKILL_COLOR_LEARNABLE .. "(" ..  skill .. ")|r";
+                                textright = textright .. learnable_color .. "(" ..  skill .. ")|r";
                             end
                             count[value] = count[value] + 1;
                             -- If this is the first time a recipe is being added, add a explanation line
                             if (count[value] == 1) then
                                 if ( MTS_ShowTooltip == true ) then
-                                    frame:AddDoubleLine(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_MAIN_COLOR .. MTS_RECIPES .. "|r", MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_RECIPE_MAIN_COLOR .. value .. " (" .. MTS_SkillLevel .. ")|r");
+                                    local color = "|cFF00FF11"
+                                    frame:AddDoubleLine(color .. MTS_RECIPES .. "|r", color .. value .. " (" .. MTS_SkillLevel .. ")|r");
                                 end
                             end
-                            if (AltKnownBy ~= "" and MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_ALTNAME == 1 ) then
-                               textright =  AltKnownBy;
+
+                            if AltKnownBy ~= "" and self.options.ShowAltName then
+                               textright = AltKnownBy;
                             end
+
                             -- Add the tooltip
                             MTS_TOOLTIP_SKILLEVEL = 0;
                             for i=1,5 do
-                                if(skilllevel_color== MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_TRADESKILL_SKILLLEVEL_COLOR[i]) then
+                                if(skilllevel_color== skill_level_to_color[i]) then
                                     MTS_TOOLTIP_SKILLEVEL = i;
-                                    if ( MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_UNKNOWNTOBOTTOM == 1 ) then
+                                    if self.options.SortingOptions.NotLearnedSkillsLast then
                                         if (MTS_TOOLTIP_SKILLEVEL == 5) then MTS_TOOLTIP_SKILLEVEL = 0; end
                                     end
                                 end
@@ -506,7 +397,18 @@ function MasterTradeSkills_CheckTooltipInfo(frame, name)
                     end
                 end
             end
-            table.sort(MTS_TOOLTIP_DB, MTS_CompareSkilllvl);
+
+            -- TODO sort not only by COLOR but by real skill level
+            -- TODO sort and THEN limit count
+            -- TODO sort by lvl then by some other criteria
+            local compare
+            if self.options.SortingOptions.HigherLevelSkillsFirst then
+                compare = function (a, b) return a.skilllvl > b.skilllvl end
+            else
+                compare = function (a, b) return a.skilllvl < b.skilllvl end
+            end
+            table.sort(MTS_TOOLTIP_DB, compare);
+
             for i=1, table.getn(MTS_TOOLTIP_DB) do
                 for j=1, table.getn(MTS_TOOLTIP_DB[i]) do
                     frame:AddDoubleLine(MTS_TOOLTIP_DB[i][j].textl, MTS_TOOLTIP_DB[i][j].textr);
@@ -514,14 +416,6 @@ function MasterTradeSkills_CheckTooltipInfo(frame, name)
             end
             MTS_TOOLTIP_DB = {};
         end
-    end
-end
-
-function MTS_CompareSkilllvl(a,b)
-    if ( MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWREV ) then
-        return a.skilllvl > b.skilllvl;
-    else
-        return a.skilllvl < b.skilllvl;
     end
 end
 
@@ -591,76 +485,4 @@ function MasterTradeSkill_IsTradeSkill(skill)
         end
     end
     return MTS_IsTradeSkill
-end
-
-function MTS_Options_Toggle()
-    if (MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE == 1) then
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE = 0;
-    else
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE = 1;
-    end
-    MTS_OptionsFrameCheck_Enabled:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_STATE);
-end
-
-function MTS_Options_ToggleShowOnShiftKeyDown()
-    if (MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN == 1) then
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN = 0;
-    else
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN = 1;
-    end
-    MTS_OptionsFrameCheck_ShowOnShiftKeyDown:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWONSHIFTKEYDOWN);
-end
-
-function MTS_Options_ToggleShowLearned()
-    if (MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWLEARNED == 1) then
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWLEARNED = 0;
-    else
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWLEARNED = 1;
-    end
-    MTS_OptionsFrameCheck_ShowLearned:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWLEARNED);
-end
-
-function MTS_Options_ToggleShowNotLearned()
-    if (MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWNOTLEARNED == 1) then
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWNOTLEARNED = 0;
-    else
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWNOTLEARNED = 1;
-    end
-    MTS_OptionsFrameCheck_ShowNotLearned:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOWNOTLEARNED);
-end
-
-function MTS_Options_ToggleUnknown()
-    if (MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_UNKNOWNTOBOTTOM == 1) then
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_UNKNOWNTOBOTTOM = 0;
-    else
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_UNKNOWNTOBOTTOM = 1;
-    end
-    MTS_OptionsFrameCheck_UnknownToBot:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_UNKNOWNTOBOTTOM);
-end
-
-function MTS_Options_ToggleAltName()
-    if (MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_ALTNAME == 1) then
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_ALTNAME = 0;
-    else
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_ALTNAME = 1;
-    end
-    MTS_OptionsFrameCheck_AltName:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_ALTNAME);
-end
-
-function MTS_Options_ToggleMinimap()
-    if (MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_MOUSEOVER == 1) then
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_MOUSEOVER = 0;
-    else
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_MOUSEOVER = 1;
-    end
-    MTS_OptionsFrameCheck_NoMinimap:SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_MOUSEOVER);
-end
-
-function MTS_Options_ToggleShowTradeSkills(arg1, arg2)
-    if (MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOW_TRADESKILLS[arg2] == 1) then
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOW_TRADESKILLS[arg2] = 0;
-    else
-        MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOW_TRADESKILLS[arg2] = 1;
-    end
-    getglobal("MTS_OptionsFrameCheck_ShowTradeSkills" .. arg2):SetChecked(MTS_DATA.Characters[MTS_CHAR_INDEX].Options.MTS_SHOW_TRADESKILLS[arg2]);
 end

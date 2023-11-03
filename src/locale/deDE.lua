@@ -1,18 +1,6 @@
 function MasterTradeSkills_LoadGerman()
 -- Global Variables
 MTS_LOADED = "Master Trade Skills v".. MTS_VERSION .. " AddOn geladen";
-MTS_HELP = {
-    [1] = "|cFFFF0000MasterTradeSkills commands:|r";
-    [2] = "/MTS On : MasterTradeSkills einschalten";
-    [3] = "/MTS Off : MasterTradeSkills ausschalten";
-    [4] = "/MTS Toggle : Zwischen ein/aus umschalten";
-    [5] = "/MTS Options : Optionen anzeigen";
-};
-MTS_WRONGSLASH = "F\195\188r Hilfe tippe \"/MasterTradeSkills help\"";
-MTS_ENABLED = "MasterTradeSkills ist aktiviert";
-MTS_DISABLED = "MasterTradeSkills ist deaktiviert";
-BINDING_NAME_MTS_TEXT = "Optionen konfigurieren";
-BINDING_NAME_MTS_SHOW = "Rezeptliste anzeigen";
 
 -- Global Variables
 MTS_RECIPES = "Rezepte";
@@ -30,11 +18,11 @@ MTS_TRADESKILLS = {
 };
 -- Dont know if there are localized versions of these...
 
-MTS_DIF1 = "Zeige |cFFA0A0A0[ Trivial ]";
-MTS_DIF2 = "Zeige |cFF40C040[ Leicht ]";
-MTS_DIF3 = "Zeige |cFFFFEE00[ Mittel ]";
-MTS_DIF4 = "Zeige |cFFFF9900[ Optimal ]";
-MTS_DIF5 = "Zeige |cFFFF0000[ Zu hoch ]";
+MTS_DIF1 = "Zeige |cFFA0A0A0Trivial";
+MTS_DIF2 = "Zeige |cFF40C040Leicht";
+MTS_DIF3 = "Zeige |cFFFFEE00Mittel";
+MTS_DIF4 = "Zeige |cFFFF9900Optimal";
+MTS_DIF5 = "Zeige |cFFFF0000Schwierig";
 MTS_REVERSE = "Schwere Rezepte zuerst";
 
 MTS_OPT_ENABLE = "Aktiviere " .. MTS_NAME;
