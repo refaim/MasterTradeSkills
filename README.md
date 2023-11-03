@@ -6,8 +6,9 @@
 ### Authors
 - Original version: DaDaemon
 - [Resurrection and reupload](https://www.curseforge.com/wow/addons/project-2618): [Triadian](https://github.com/Triadian)
-- German Localization: Farook
 - [Ace3v](https://github.com/laytya/Ace3v/) & [TradeSkillsData](https://github.com/refaim/TradeSkillsData) rewrite: [Refaim](https://github.com/refaim)
+- German Localization: Farook
+- Russian Localization: [KasVital](https://github.com/KasVital)
 
 ### Description
 This addon is an information tool for all you trade skill loving fools! It will alter the tooltips of ingredients and tells you the following things:

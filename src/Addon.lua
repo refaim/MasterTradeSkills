@@ -107,10 +107,10 @@ function MasterTradeSkills:OnEnable()
     -- TODO use AceLocale
     if (GetLocale() == "deDE") then
         MasterTradeSkills_LoadGerman();
-        ReagentData_LoadGerman();
     elseif (GetLocale() == "frFR") then
         MasterTradeSkills_LoadFrench();
-        ReagentData_LoadFrench();
+    elseif (GetLocale() == "ruRU") then
+        MasterTradeSkills_LoadRussian()
     end
 
     MasterTradeSkills_Write(MTS_LOADED);
