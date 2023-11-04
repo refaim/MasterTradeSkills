@@ -1,6 +1,7 @@
 ## Interface: 11200
 ## Title: MasterTradeSkills
 ## Notes: This AddOn adjusts the display of the tooltips to show which recipe is being used by the item your hovering above
+## Notes-ruRU: Это дополнение настраивает отображение всплывающих подсказок, чтобы показать, какой рецепт используется предметом, над которым вы наводите курсор.
 ## Author: DaDaemon, Triadian, Farook, Refaim
 ## Version: 1.12.4
 ## Dependencies: ReagentData, TradeSkillsData
