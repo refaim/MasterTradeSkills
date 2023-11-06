@@ -73,7 +73,7 @@ function MasterTradeSkills_Database:Initialize(LibStub)
         },
     }
 
-    local AceDB = --[[---@type AceDBDef]] LibStub("AceDB-3.0")
+    local AceDB, _ = LibStub("AceDB-3.0")
     return --[[---@type MasterTradeSkillsDB]] AceDB:New("MasterTradeSkillsData", defaults)
 end
 

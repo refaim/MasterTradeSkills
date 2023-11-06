@@ -106,7 +106,7 @@ function MasterTradeSkills_LegacyDatabase:ImportOptions(defaults)
             NotLearnedSkillsLast = to_boolean(ldb.MTS_UNKNOWNTOBOTTOM, defaults.SortingOptions.NotLearnedSkillsLast),
         },
         ShowAltName = to_boolean(ldb.MTS_ALTNAME, defaults.ShowAltName),
-        HowManySkillsToShow = ldb.MTS_NUMTOSHOW or defaults.HowManySkillsToShow,
+        HowManySkillsToShow = ldb.MTS_NUMTOSHOW or defaults.HowManySkillsToShow, -- TODO check that legacy value falls into [a..b]
     }
 
     player.Options = --[[---@type MasterTradeSkillsLegacyDBOptions]] {}

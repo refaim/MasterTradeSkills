@@ -18,7 +18,7 @@ function MasterTradeSkills_Utils:NewLocale(code, is_default)
     local LibStub = getglobal("LibStub")
     assert(LibStub ~= nil, "Cannot find instance of a LibStub")
 
-    local AceLocale = --[[---@type LibAceLocaleDef]] LibStub("AceLocale-3.0")
+    local AceLocale, _ = LibStub("AceLocale-3.0")
     local L = --[[---@type MasterTradeSkillsLocale]] AceLocale:NewLocale(MTS_NAME, code, is_default)
     if is_default then
         assert(L ~= nil)

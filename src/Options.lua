@@ -2,7 +2,7 @@
 local LibStub = getglobal("LibStub")
 assert(LibStub ~= nil, "Cannot find instance of a LibStub")
 
-local AceConfigDialog = --[[---@type LibAceConfigDialogDef]] LibStub("AceConfigDialog-3.0")
+local AceConfigDialog, _ = LibStub("AceConfigDialog-3.0")
 
 ---@class MasterTradeSkills_Options
 ---@field __application string
@@ -206,7 +206,7 @@ end
 local function SupportClosingWithEscape(app_name, frame)
     local name = app_name .. "OptionsFrame"
     setglobal(name, frame)
-    tinsert(UISpecialFrames, name)
+    tinsert(UISpecialFrames, name) -- TODO handle escape manually
 end
 
 ---@param L MasterTradeSkillsLocale
@@ -218,7 +218,7 @@ function MasterTradeSkills_Options:Initialize(L, application, database, AceConfi
     AceConfigDialog:AddToBlizOptions(application)
     self.__application = application
 
-    local AceGUI = --[[---@type LibAceGUIDef]] LibStub("AceGUI-3.0")
+    local AceGUI, _ = LibStub("AceGUI-3.0")
     local frame = AceGUI:Create("Frame")
     AceConfigDialog:Open(application, frame)
     frame:Hide()

@@ -21,17 +21,18 @@ MTS_DATA_CHECKED = false;
 local LibStub = getglobal("LibStub")
 assert(LibStub ~= nil, "Cannot find instance of a LibStub")
 
----@type LibAceAddonDef
-local AceAddon = --[[---@type LibAceAddonDef]] LibStub("AceAddon-3.0")
+local AceAddon, _ = LibStub("AceAddon-3.0")
 
 ---@type AceAddonDef
 ---@field database MasterTradeSkillsDB
 ---@field options MasterTradeSkillsDBOptions
 local MasterTradeSkills = AceAddon:NewAddon(MTS_NAME, "AceConfig-3.0", "AceEvent-3.0", "AceHook-3.0")
 
-local AceLocale = --[[---@type LibAceLocaleDef]] LibStub("AceLocale-3.0")
+local AceLocale, _ = LibStub("AceLocale-3.0")
 local L = --[[---@type MasterTradeSkillsLocale]] AceLocale:GetLocale(MTS_NAME, false)
 local LR = --[[---@type table<string, string>]] L
+
+local LibProfession = --[[---@type LibProfession]] LibStub("LibProfession-1.0")
 
 MTS_TRADESKILLS = {
     [1] = L.txt_trade_skill_cooking,
@@ -95,6 +96,31 @@ function MasterTradeSkills:OnEnable()
 
     self:AceEvent():RegisterEvent("CRAFT_SHOW", function(event) MasterTradeSkills_ReadCrafts() end)
     self:AceEvent():RegisterEvent("CRAFT_UPDATE", function(event) MasterTradeSkills_ReadCrafts() end)
+
+    local f = function (message, payload)
+        print(message)
+        local info = LibProfession:GetOpenedProfessionInfo(payload.profession_id)
+        local skills = LibProfession:GetOpenedProfessionKnownSkills(payload.profession_id)
+        local n = nil
+        if skills ~= nil then
+            n = getn(skills)
+        end
+        print(format("%s %s %s", payload.profession_id, tostring(info.localized_name), tostring(n)))
+    end
+
+    LibProfession:RegisterMessage("PROFESSION_FRAME_OPEN", f)
+    LibProfession:RegisterMessage("PROFESSION_FRAME_UPDATE", f)
+
+    LibProfession:RegisterMessage("PROFESSION_FRAME_CLOSE", function (message, payload)
+        print(message)
+        print(payload.profession_id)
+        if payload.profession_id ~= nil then
+            local info = LibProfession:GetOpenedProfessionInfo(payload.profession_id)
+            print("info = " .. tostring(info))
+            local skills = LibProfession:GetOpenedProfessionKnownSkills(payload.profession_id)
+            print("skills = " .. tostring(skills))
+        end
+    end)
 
     ---@return boolean
     local function is_player_name_known()
