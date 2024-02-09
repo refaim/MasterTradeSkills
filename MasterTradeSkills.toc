@@ -2,7 +2,7 @@
 ## Title: MasterTradeSkills
 ## Notes: This AddOn adjusts the display of the tooltips to show which recipe is being used by the item your hovering above
 ## Author: Triadian (triadian@gmail.com)
-## Version: 1.12.4
+## Version: 1.12.5
 ## Dependencies: ReagentData
 ## OptionalDeps: MyAddons
 ## DefaultState: enabled

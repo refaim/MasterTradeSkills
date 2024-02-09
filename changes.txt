@@ -1,3 +1,7 @@
+v1.12.5 (2024/02/09)
+    Fix "Soul Bag" -> "Soul Pouch" name
+    Add missing "Gyrofreeze Ice Reflector" name and the German localization
+
 v1.12.4 (2023/11/01)
     Ignore quest chat links
     Fix localization file Lua errors
