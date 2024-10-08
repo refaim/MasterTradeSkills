@@ -1,8 +1,10 @@
+setfenv(1, MasterTradeSkills)
+
 local L = --[[---@type MasterTradeSkillsLocale]] MasterTradeSkills_Utils:NewLocale("ruRU", false)
 if L == nil then return end
 
-L.txt_addon_loaded = format("Аддон Master Trade Skills v%s успешно загружен", MTS_VERSION)
-L.txt_locale_missing = "Пожалуйста, сообщите Refaim о том что перевод отсутствует для %s"
+L.txt_addon_loaded = format("Аддон Master Trade Skills v%s успешно загружен", MtsAddonVersion)
+L.txt_missing_locale = "Пожалуйста, сообщите Refaim, что локаль для \"%s\" отсутствует: https://github.com/refaim/MasterTradeSkills/issues/new"
 L.txt_open_options = "Открыть настройки"
 
 L.txt_option_group_enable = "Состояние"
@@ -23,6 +25,7 @@ L.txt_option_group_details = "Детали"
 L.txt_option_show_learned = "Показывать изученные навыки"
 L.txt_option_show_not_learned = "Показывать неизученные навыки"
 L.txt_option_show_alt_name = "Показывать имена альтов"
+L.txt_option_show_cross_faction_alts = "Показывать альтов из другой фракции"
 L.txt_option_how_many_skills_to_show = "Сколько навыков показывать в тултипе"
 
 L.txt_option_group_sorting = "Сортировка"
@@ -35,17 +38,6 @@ L.txt_source_trainer = "Тренер"
 L.txt_source_drop = "Дроп"
 L.txt_source_quest = "Задание"
 L.txt_source_unknown = "Неизвестно"
-
-L.txt_trade_skill_cooking = "Кулинария"
-L.txt_trade_skill_tailoring = "Портняжное дело"
-L.txt_trade_skill_enchanting = "Наложение чар"
-L.txt_trade_skill_leatherworking = "Кожевничество"
-L.txt_trade_skill_blacksmithing = "Кузнечное дело"
-L.txt_trade_skill_alchemy = "Алхимия"
-L.txt_trade_skill_engineering = "Инженерное дело"
-L.txt_trade_skill_first_aid = "Первая помощь"
-L.txt_trade_skill_mining = "Горное дело"
-L.txt_trade_skill_poisons = "Яды"
 
 local T = --[[---@type table<string, string>]] L
 T["Accurate Scope"] = "Точный прицел"

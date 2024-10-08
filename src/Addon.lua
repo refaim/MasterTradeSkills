@@ -1,59 +1,30 @@
--- TODO setfenv
-
--- Database, inspired by BookOfCrafts
---[[
-    .Characters                : Indexed table of characters
-       [i]                     : Acces to i-th character
-          .Name                : Character name
-          .Realm               : Character realm
-          .Faction             : Character faction
-    [tradeskill]               : Contains all known craft objects for "tradeskill" (tailor, alchemy, ...)
-       [crafted_object]        : Data for specific "crafted_object"
-          .LearntBy[i]         : index in ".Characters" of i-th character who knows this tradeskills
-]]--
--- TODO remove this global variables
----@type MasterTradeSkillsLegacyDB
-MTS_DATA = {};
-MTS_PLAYER_NAME_KNOWN = false;
-MTS_DATA_CHECKED = false;
+setfenv(1, MasterTradeSkills)
 
 ---@type LibStubDef
 local LibStub = getglobal("LibStub")
 assert(LibStub ~= nil, "Cannot find instance of a LibStub")
 
----@type LibAceAddonDef
-local AceAddon = --[[---@type LibAceAddonDef]] LibStub("AceAddon-3.0")
+local AceAddon, _ = LibStub("AceAddon-3.0")
 
 ---@type AceAddonDef
----@field database MasterTradeSkillsDB
+---@field db MasterTradeSkills_Database
 ---@field options MasterTradeSkillsDBOptions
-local MasterTradeSkills = AceAddon:NewAddon(MTS_NAME, "AceConfig-3.0", "AceEvent-3.0", "AceHook-3.0")
+---@field reagent_to_profession_id_to_items table<string, table<string, string[]>>
+---@field localized_known_crafting_profession_name_set table<string, boolean>
+local MasterTradeSkills = AceAddon:NewAddon(MtsAddonName, "AceConfig-3.0", "AceHook-3.0")
 
-local AceLocale = --[[---@type LibAceLocaleDef]] LibStub("AceLocale-3.0")
-local L = --[[---@type MasterTradeSkillsLocale]] AceLocale:GetLocale(MTS_NAME, false)
+local AceCore, _ = LibStub("AceCore-3.0")
+local AceDB, _ = LibStub("AceDB-3.0")
+
+local AceLocale, _ = LibStub("AceLocale-3.0")
+local L = --[[---@type MasterTradeSkillsLocale]] AceLocale:GetLocale(MtsAddonName, false)
 local LR = --[[---@type table<string, string>]] L
 
-MTS_TRADESKILLS = {
-    [1] = L.txt_trade_skill_cooking,
-    [2] = L.txt_trade_skill_tailoring,
-    [3] = L.txt_trade_skill_enchanting,
-    [4] = L.txt_trade_skill_leatherworking,
-    [5] = L.txt_trade_skill_blacksmithing,
-    [6] = L.txt_trade_skill_alchemy,
-    [7] = L.txt_trade_skill_engineering,
-    [8] = L.txt_trade_skill_first_aid,
-    [9] = L.txt_trade_skill_mining,
-    [10] = L.txt_trade_skill_poisons,
-};
+local LibCraftingProfessions = --[[---@type LibCraftingProfessions]] LibStub("LibCraftingProfessions-1.0")
 
 ---@return LibAceConfigEmbedDef
 function MasterTradeSkills:AceConfig()
     return --[[---@type LibAceConfigEmbedDef]] self
-end
-
----@return LibAceEventEmbedDef
-function MasterTradeSkills:AceEvent()
-    return --[[---@type LibAceEventEmbedDef]] self
 end
 
 ---@return LibAceHookEmbedDef
@@ -61,16 +32,41 @@ function MasterTradeSkills:AceHook()
     return --[[---@type LibAceHookEmbedDef]] self
 end
 
--- TODO keybindings for the options window
+---@return void
 function MasterTradeSkills:OnInitialize()
-    self.database = MasterTradeSkills_Database:Initialize(LibStub)
-    self.options = self.database.char.Options
-    MasterTradeSkills_Options:Initialize(L, MTS_NAME, self.options, self:AceConfig())
+    self.db = MasterTradeSkills_Database:Initialize(AceDB, LibCraftingProfessions)
+    self.db_options = self.db:GetOptions()
+    MasterTradeSkills_Options:Initialize(L, MtsAddonName, self.db_options, self:AceConfig())
+
+    local event_frame = CreateFrame("Frame", nil, GameTooltip)
+    event_frame:SetScript("OnShow", function()
+        self:PreHookGameTooltipOnShow()
+    end)
+    self:AceHook():SecureHook("SetItemRef", "PostHookSetItemRef")
+
+    LibCraftingProfessions:RegisterEvent("LCP_SKILLS_UPDATE", function(profession, skills)
+        self.db:SavePlayerSkills(profession, skills)
+    end)
 end
 
+---@return void
 function MasterTradeSkills:OnEnable()
-    ---@type table<string, function>
-    local reagent_data_loaders = {
+    self:LoadReagentData()
+
+    ---@type table<string, boolean>
+    local localized_crafting_profession_name_set = {}
+    for _, profession in ipairs(LibCraftingProfessions:GetSupportedProfessions()) do
+        localized_crafting_profession_name_set[profession.localized_name] = true
+    end
+    self.localized_crafting_profession_name_set = localized_crafting_profession_name_set
+
+    self:Print(L.txt_addon_loaded);
+end
+
+---@return void
+function MasterTradeSkills:LoadReagentData()
+    ---@type table<string, fun():void>
+    local id_to_loader = {
         alchemy = ReagentData_LoadAlchemy,
         blacksmithing = ReagentData_LoadBlacksmithing,
         cooking = ReagentData_LoadCooking,
@@ -82,413 +78,367 @@ function MasterTradeSkills:OnEnable()
         poisons = ReagentData_LoadPoisons,
         tailoring = ReagentData_LoadTailoring,
     }
-    ---@type table<string, any>
-    local database = ReagentData['crafted']
-    for profession, loader in pairs(reagent_data_loaders) do
-        if database[profession] == nil then
+
+    local reagent_data = self:GetReagentData()
+    for profession_id, loader in pairs(id_to_loader) do
+        if reagent_data['crafted'][profession_id] == nil then
             loader()
         end
     end
 
-    self:AceEvent():RegisterEvent("TRADE_SKILL_SHOW", function(event) MasterTradeSkills_ReadRecipes() end)
-    self:AceEvent():RegisterEvent("TRADE_SKILL_UPDATE", function(event) MasterTradeSkills_ReadRecipes() end)
-
-    self:AceEvent():RegisterEvent("CRAFT_SHOW", function(event) MasterTradeSkills_ReadCrafts() end)
-    self:AceEvent():RegisterEvent("CRAFT_UPDATE", function(event) MasterTradeSkills_ReadCrafts() end)
-
-    ---@return boolean
-    local function is_player_name_known()
-        local name, _ = UnitName("player")
-        return name ~= nil and name ~= "" and name ~= UNKNOWNOBJECT
+    ---@type table<string, table<string, string[]>>
+    local reagent_to_profession_to_items = {}
+    for profession_id, item_to_props in pairs(reagent_data['crafted']) do
+            for item, item_props in pairs(item_to_props) do
+                for reagent, _ in pairs(item_props['reagents']) do
+                    if reagent_to_profession_to_items[reagent] == nil then
+                        reagent_to_profession_to_items[reagent] = {}
+                    end
+                    if reagent_to_profession_to_items[reagent][profession_id] == nil then
+                        reagent_to_profession_to_items[reagent][profession_id] = {}
+                    end
+                tinsert(reagent_to_profession_to_items[reagent][profession_id], item)
+            end
+        end
     end
-
-    self:AceEvent():RegisterEvent("PLAYER_ENTERING_WORLD", function(event)
-        if is_player_name_known() then
-            MTS_PLAYER_NAME_KNOWN = true
-            MasterTradeSkills_InitData()
-        end
-    end)
-
-    self:AceEvent():RegisterEvent("UNIT_NAME_UPDATE", function(event, unit)
-        if unit == "player" and is_player_name_known() then
-            MTS_PLAYER_NAME_KNOWN = true
-            MasterTradeSkills_InitData()
-        end
-    end)
-
-    self:AceHook():SecureHook("SetItemRef", "PostHookSetItemRef")
-    self:AceHook():HookScript(GameTooltip, "OnShow", "PreHookGameTooltipShow")
-
-    MasterTradeSkills_Write(L.txt_addon_loaded);
+    self.localized_reagent_to_profession_id_to_en_items = reagent_to_profession_to_items
 end
 
+---@shape ReagentDataItem
+---@field skill number
+---@field source string
+---@field reagents table<string, number>
+
+---@shape ReagentData
+---@field crafted table<string, table<string, ReagentDataItem>>
+---@field gathering table<string, string>
+---@field professions table<string, string>
+---@field reverseprofessions table<string, string>
+
+---@return ReagentData
+function MasterTradeSkills:GetReagentData()
+    return --[[---@type ReagentData]] ReagentData
+end
+
+---@return void
 function MasterTradeSkills:PostHookSetItemRef(link, text, button)
     local prefix_supported = strsub(link, 1, strlen("item")) == "item"
     if prefix_supported and not IsControlKeyDown() and not IsShiftKeyDown() then
         local name, _, _, _, _, _, _, _, _ = GetItemInfo(link);
-        self:EnhanceTooltip(ItemRefTooltip, name)
-        ItemRefTooltip:Show()
+        if name ~= nil and self:EnhanceTooltip(ItemRefTooltip, name) then
+            ItemRefTooltip:Show()
+        end
     end
 end
 
-function MasterTradeSkills:PreHookGameTooltipShow()
-    if not MTS_PLAYER_NAME_KNOWN or not MTS_DATA_CHECKED then
+---@return void
+function MasterTradeSkills:PreHookGameTooltipOnShow()
+    local enhance = self.db_options.EnhanceTooltips
+        and (IsShiftKeyDown() or not self.db_options.EnhanceTooltipsOnlyWhileShiftIsPressed)
+        and (self.db_options.EnhanceMinimapNodesTooltips or not MouseIsOver(MinimapCluster))
+
+    if not enhance then
         return
     end
 
-    local enabled = self.options.EnhanceTooltips
-        and (IsShiftKeyDown() or not self.options.EnhanceTooltipsOnlyWhileShiftIsPressed)
-        and (self.options.EnhanceMinimapNodesTooltips or not MouseIsOver(MinimapCluster))
-    if not enabled then
-        return
-    end
-
-    -- TODO refactor
-    local lbl = getglobal("GameTooltipTextLeft1");
-    if lbl then
-        local name = lbl:GetText();
-        name = string.gsub(name, "Vein","Ore");
-        name = string.gsub(name, "Deposit","Ore");
-        if ( strfind(name,"Ore") ~= nil ) then
-            name = string.gsub(name, "Rich ","");
-            name = string.gsub(name, "Small ","");
-            name = string.gsub(name, "Ooze Covered ","");
-        end
-        self:EnhanceTooltip(GameTooltip, name);
+    local item = self:ExtractItemFromTooltip()
+    if item ~= nil and self:EnhanceTooltip(GameTooltip, --[[---@not nil]] item) then
+        GameTooltip:Show()
     end
 end
 
-function MasterTradeSkills_InitData()
-    if((MTS_PLAYER_NAME_KNOWN) and (not MTS_DATA_CHECKED) ) then
-        MTS_CHAR_NAME    = UnitName( "player" )
-        MTS_CHAR_REALM   = GetCVar( "realmName" )
-        MTS_CHAR_FACTION = UnitFactionGroup( "player" )
+---@return string|nil
+function MasterTradeSkills:ExtractItemFromTooltip()
+    ---@type FontString|nil
+    local label = getglobal("GameTooltipTextLeft1")
+    if label == nil then
+        return nil
+    end
 
-        if( not MTS_DATA.Characters ) then
-            MTS_DATA.Characters = {};
+    local text_or_nil = (--[[---@not nil]] label):GetText()
+    if text_or_nil == nil or text_or_nil == "" then
+        return nil
+    end
+
+    local text = --[[---@not nil]] text_or_nil
+    local subs = 0
+    for _, suffix in ipairs({"Vein", "Deposit"}) do
+        text, subs = gsub(text, suffix, "Ore")
+        if subs > 0 then
+            break
         end
-
-        -- Find character name
-        local nb_chars = table.getn( MTS_DATA.Characters );
-        MTS_CHAR_INDEX = nil;
-
-        for i = 1, nb_chars do
-            if((MTS_DATA.Characters[i].Name==MTS_CHAR_NAME) and
-                (MTS_DATA.Characters[i].Realm==MTS_CHAR_REALM) and
-                (MTS_DATA.Characters[i].Faction==MTS_CHAR_FACTION)) then
-                MTS_CHAR_INDEX = i;
+    end
+    if strfind(text, "Ore", 1, true) ~= nil then
+        for _, prefix in ipairs({"Small", "Rich", "Ooze Covered"}) do
+            text, subs = gsub(text, prefix .. " ", "")
+            if subs > 0 then
                 break
             end
         end
-
-        -- if not found, register new character
-        if( MTS_CHAR_INDEX==nil ) then
-            MTS_CHAR_INDEX = nb_chars+1;
-            MTS_DATA.Characters[MTS_CHAR_INDEX] = {};
-            MTS_DATA.Characters[MTS_CHAR_INDEX].Name    = MTS_CHAR_NAME;
-            MTS_DATA.Characters[MTS_CHAR_INDEX].Realm   = MTS_CHAR_REALM;
-            MTS_DATA.Characters[MTS_CHAR_INDEX].Faction = MTS_CHAR_FACTION;
-        end
-
-        MTS_DATA_CHECKED = true;
     end
+
+    return text
 end
 
-function MasterTradeSkills:EnhanceTooltip(frame, name) -- TODO change signature
-    local professions = ReagentData_GetProfessions(name);
-    local totalcount = 0;
-    -- text will hold the recipes to be written to the frame.
-    local textleft = "";
-    local prechar = "";
-    local textright = "";
-    local textline = 1;
-    local skill = nil;
-    local source = "";
-    local MTS_Max = table.getn(MTS_TRADESKILLS);
-    local count = {};
-    for i=1, MTS_Max do
-        count[MTS_TRADESKILLS[i]] = 0;
+---@shape TooltipItemGroup
+---@field localized_profession_name string
+---@field my_profession_rank number|nil
+---@field items TooltipItem[]
+
+---@shape TooltipItem
+---@field localized_name string
+---@field localized_source string
+---@field required_rank number
+---@field is_reagent boolean
+---@field difficulty string|nil
+---@field other_character_to_difficulty table<string, string>
+
+---@param tooltip GameTooltip
+---@param item string
+---@return boolean
+function MasterTradeSkills:EnhanceTooltip(tooltip, item)
+    local groups = self:CreateTooltipItemGroups(item)
+    groups = self:FilterTooltipItemGroups(groups)
+    self:SortTooltipItemGroups(groups)
+    groups = self:LimitTooltipItemGroups(groups)
+    if getn(groups) == 0 then
+        return false
+    end
+    self:DrawTooltipItemGroups(tooltip, groups)
+    return true
+end
+
+---@param possible_reagent string
+---@return TooltipItemGroup[]
+function MasterTradeSkills:CreateTooltipItemGroups(possible_reagent)
+    ---@type table<string, string>
+    local en_source_to_localized_source = {
+        ["Drop"] = L.txt_source_drop,
+        ["Quest"] = L.txt_source_quest,
+        ["Trainer"] = L.txt_source_trainer,
+        ["Unknown"] = L.txt_source_unknown,
+        ["Vendor"] = L.txt_source_vendor,
+    }
+
+    ---@type table<string, {rank: number|nil}>
+    local my_profession_localized_name_to_rank = {}
+    for _, profession in ipairs(LibCraftingProfessions:GetPlayerProfessions() or {}) do
+        my_profession_localized_name_to_rank[profession.localized_name] = {["rank"] = profession.cur_rank}
     end
 
-    local endsource = 0;
-    local skilllevel_color = "";
-    -- Make a new database for the tooltip
-    local MTS_TOOLTIP_DB = {};
-    local MTS_TOOLTIP_SKILLEVEL = 0;
+    local reagent_data = self:GetReagentData()
+    local player_db = self.db:GetOrCreatePlayer()
+    ---@type TooltipItemGroup[]
+    local item_groups = {}
+    for profession_id, en_item_names in pairs(self.localized_reagent_to_profession_id_to_en_items[possible_reagent] or {}) do
+        local localized_profession_name = reagent_data['professions'][profession_id] or reagent_data['gathering'][profession_id]
+        local is_profession_supported = self.localized_crafting_profession_name_set[localized_profession_name] ~= nil
+        local is_profession_enabled_in_tooltips = self.db_options.ShowSkillsByTradeSkill[localized_profession_name]
+        if is_profession_supported and is_profession_enabled_in_tooltips then
+            ---@type TooltipItem[]
+            local group_items = {}
+            for _, en_item_name in ipairs(en_item_names) do
+                local item = reagent_data['crafted'][profession_id][en_item_name]
+                local localized_item_name = LR[en_item_name]
+                local source, _ = AceCore.strsplit(":", item.source, 2)
+                local is_reagent = false
+                if localized_item_name ~= nil then
+                    is_reagent = getn(ReagentData_GetProfessions(localized_item_name) or {}) > 0
+                else
+                    self:Print(format(L.txt_missing_locale, en_item_name))
+                end
 
-    local recipe_source_color = "|cFF56B59D"
-    local learnable_color = "|cFF00FF00"
-    local unlearnable_color = "|cFFFF0000"
-    ---@type table<number, string>
-    local skill_level_to_color = {
-        [1] = "|cFFA0A0A0";
-        [2] = "|cFF40C040";
-        [3] = "|cFFFFEE00";
-        [4] = "|cFFFF9900";
-        [5] = "|cFFFF0000";
-    };
+                ---@type table<string, string>
+                local other_character_to_difficulty = {}
+                for _, character in ipairs(self.db:GetOtherCharactersFromCurrentRealm()) do
+                    other_character_to_difficulty[character.name] = character.profession_to_skill_to_difficulty[localized_profession_name][localized_item_name]
+                end
 
-    if ( professions == nil ) then return end
+                ---@type TooltipItem
+                local tooltip_item = {
+                    localized_name = localized_item_name or en_item_name,
+                    localized_source = en_source_to_localized_source[--[[---@not nil]] source] or source,
+                    required_rank = item.skill,
+                    is_reagent = is_reagent,
+                    difficulty = player_db.profession_to_skill_to_difficulty[localized_profession_name][localized_item_name],
+                    other_character_to_difficulty = other_character_to_difficulty,
+                }
+                tinsert(group_items, tooltip_item)
+            end
 
-    -- Loop through the professions and recipes
-    for key, value in professions do
-        local trade_skill_index = MasterTradeSkill_IsTradeSkill(value)
-        local rd_trade_skill_id = MTS_TRADESKILLS_NAME[trade_skill_index]
-        local tsd_profession_id = MTS_TSD_PROFESSION_ID[trade_skill_index]
-        if (rd_trade_skill_id ~= nil and tsd_profession_id ~= nil and self.options.ShowSkillsByTradeSkill[tsd_profession_id]) then
-            -- Clear Tooltip Database
-            MTS_TOOLTIP_DB = {};
-            for Recipes in ReagentData['crafted'][rd_trade_skill_id] do
-                for Reagents in ReagentData['crafted'][rd_trade_skill_id][Recipes]['reagents'] do
-                    if (name == Reagents) then
-                        local MTS_SkillLevel = MasterTradeSkills_GetSkillLevel(value);
-                        textleft = "";
-                        textright = "";
-                        -- Get the skill level and source of the recipe
-                        skill = ReagentData['crafted'][rd_trade_skill_id][Recipes]['skill'];
-                        source = ReagentData['crafted'][rd_trade_skill_id][Recipes]['source'];
-                        -- Filter out the source
-                        endsource = string.find(source, ":");
-                        if (endsource ~= nil) then
-                            source = string.sub(source, 1 , endsource -1);
-                        elseif (source == "") then
-                            source = "?";
-                        end
-                        -- Look if the skill is know, and what color it is
-                        skilllevel_color = "";
-                        local AltKnown = 0;
-                        local AltKnownBy = "";
-                        local localeRecipes = LR[Recipes];
-                        -- First check if the data is read
-                        if (MTS_DATA[value] ~= nil) then
-                            -- Second check if the recipe is in the MTS database
-                            if (MTS_DATA[value][localeRecipes] ~= nil) then
-                                -- Third look if it has been learnt by someone
-                                if (MTS_DATA[value][localeRecipes].LearntBy ~= nil) then
-                                    -- Fourth check if the current user has learnt it
-                                    AltKnown = 1;
-                                    if (MTS_DATA[value][localeRecipes].LearntBy[MTS_CHAR_INDEX] ~= nil) then
-                                        for i=1,4 do
-                                            if (MTS_DATA[value][localeRecipes].LearntBy[MTS_CHAR_INDEX] == MTS_TRADESKILL_SKILLLEVEL[i]) then
-                                                skilllevel_color = skill_level_to_color[i];
-                                                AltKnown = 0
-                                            end
-                                        end
-                                    else
-                                    local nb_chars = table.getn( MTS_DATA.Characters );
-                                        for i=1, nb_chars do
-                                            if (MTS_DATA[value][localeRecipes].LearntBy[i] ~= nil ) then
-                                                    for q=1,4 do
-                                                        if (MTS_DATA[value][localeRecipes].LearntBy[i] == MTS_TRADESKILL_SKILLLEVEL[q]) then
-                                                            Altskilllevel_color = skill_level_to_color[q];
-                                                        end
-                                                    end
-                                                if ( MTS_DATA.Characters[i].Realm == MTS_DATA.Characters[MTS_CHAR_INDEX].Realm and MTS_DATA.Characters[i].Faction == MTS_DATA.Characters[MTS_CHAR_INDEX].Faction) then
-                                                AltKnownBy = AltKnownBy .."  |r" .. Altskilllevel_color .. "[".. MTS_DATA.Characters[i].Name .."]|r";
-                                                end
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                        if (skilllevel_color == ""  ) then
-                            if ( AltKnownBy ~= "") then
-                                skilllevel_color = recipe_source_color;
-                            else
-                                skilllevel_color = skill_level_to_color[5];
-                            end
-                        end
-                        -- Make the texts for in the tooltip
-                        local MTS_ShowTooltip = true;
-                        -- Options: Show Learned
-                        if (skilllevel_color ~= skill_level_to_color[5] and not self.options.ShowSkillsByStatus.Learned) then
-                            MTS_ShowTooltip = false;
-                        end
-                        -- Options: Show Not Learned
-                        if (skilllevel_color == skill_level_to_color[5] and not self.options.ShowSkillsByStatus.NotLearned) then
-                            MTS_ShowTooltip = false;
-                        end
-                        -- Options: Show Trivial
-                        if (skilllevel_color == skill_level_to_color[1] and not self.options.ShowSkillsByDifficulty.Trivial ) then
-                            MTS_ShowTooltip = false;
-                        end
-                        -- Options: Show Easy
-                        if (skilllevel_color == skill_level_to_color[2] and not self.options.ShowSkillsByDifficulty.Easy ) then
-                            MTS_ShowTooltip = false;
-                        end
-                        -- Options: Show Medium
-                        if (skilllevel_color == skill_level_to_color[3] and not self.options.ShowSkillsByDifficulty.Medium ) then
-                            MTS_ShowTooltip = false;
-                        end
-                        -- Options: Show Optimal
-                        if (skilllevel_color == skill_level_to_color[4] and not self.options.ShowSkillsByDifficulty.Optimal ) then
-                            MTS_ShowTooltip = false;
-                        end
-                        -- Options: Show Too High
-                        if (skilllevel_color == skill_level_to_color[5] and not self.options.ShowSkillsByDifficulty.Difficult ) then
-                            MTS_ShowTooltip = false;
-                        end
+            tinsert(item_groups, {
+                localized_profession_name = localized_profession_name,
+                my_profession_rank = (my_profession_localized_name_to_rank[localized_profession_name] or {}).rank,
+                items = group_items
+            })
+        end
+    end
 
-                        -- Options: How Many so far Vs Number to show
-                        if ( totalcount + 1 > self.options.HowManySkillsToShow ) then
-                            MTS_ShowTooltip = false;
-                        end
+    return item_groups
+end
 
-                            local localeRecipes = LR[Recipes];
-                            if (localeRecipes == nil) then
-                                localeRecipes = Recipes
-                                MasterTradeSkills_Write(L.txt_locale_missing, localeRecipes);
-                            end
+---@param groups TooltipItemGroup[]
+---@return TooltipItemGroup[]
+function MasterTradeSkills:FilterTooltipItemGroups(groups)
+    local player_db = self.db:GetOrCreatePlayer()
 
-                            -- Source Locales
-                                if ( source == "Vendor") then source = L.txt_source_vendor;
-                                elseif ( source == "Trainer") then source = L.txt_source_trainer;
-                                elseif ( source == "Drop") then source = L.txt_source_drop;
-                                elseif ( source == "Unknown") then source = L.txt_source_unknown;
-                                elseif ( source == "Quest") then source = L.txt_source_quest;
-                                end
+    local difficulty_options = self.db_options.ShowSkillsByDifficulty
+    ---@type table<string, boolean>
+    local difficulty_to_option = {
+        ["trivial"] = difficulty_options.Trivial,
+        ["easy"] = difficulty_options.Easy,
+        ["medium"] = difficulty_options.Medium,
+        ["optimal"] = difficulty_options.Optimal,
+        ["difficult"] = difficulty_options.Difficult,
+    }
 
-                            isreagent = {};
-                            isreagent = ReagentData_GetProfessions(localeRecipes);
-                                prechar = " -";
-                            if ( isreagent == nil ) then
+    local new_groups = {}
+    for _, group in ipairs(groups) do
+        local new_items = {}
+        for _, item in ipairs(group.items) do
+            local difficulty = player_db.profession_to_skill_to_difficulty[group.localized_profession_name][item.localized_name]
+            local show_by_difficulty = difficulty == nil or difficulty_to_option[difficulty or ""]
+            local show_by_learned = difficulty ~= nil and self.db_options.ShowSkillsByStatus.Learned
+                or difficulty == nil and self.db_options.ShowSkillsByStatus.NotLearned
+            if show_by_difficulty and show_by_learned then
+                tinsert(new_items, item)
+            end
+        end
+        if getn(new_items) > 0 then
+            group.items = new_items
+            tinsert(new_groups, group)
+        end
+    end
 
-                            else
-                                for key, value in isreagent do
-                                prechar = "+";
-                                end
-                            end
-                            textleft = "|cFFFFB444" .. " ".. prechar .."|r" .. skilllevel_color .. localeRecipes .. "|r";
-                            textright = recipe_source_color .. source .. "|r ";
-                            if (skill ~= nil and skill ~= "") then
-                                if (skill > MTS_SkillLevel) then
-                                    textright = textright .. unlearnable_color .. "(" ..  skill .. ")|r";
-                                else
-                                    textright = textright .. learnable_color .. "(" ..  skill .. ")|r";
-                                end
-                            else
-                                if (skill == nil or skill == "") then
-                                    skill = "?";
-                                end
-                                textright = textright .. learnable_color .. "(" ..  skill .. ")|r";
-                            end
-                            count[value] = count[value] + 1;
-                            -- If this is the first time a recipe is being added, add a explanation line
-                            if (count[value] == 1) then
-                                if ( MTS_ShowTooltip == true ) then
-                                    local color = "|cFF00FF11"
-                                    frame:AddDoubleLine(color .. L.txt_recipes .. "|r", color .. value .. " (" .. MTS_SkillLevel .. ")|r");
-                                end
-                            end
+    return new_groups
+end
 
-                            if AltKnownBy ~= "" and self.options.ShowAltName then
-                               textright = AltKnownBy;
-                            end
+---@param groups TooltipItemGroup[]
+function MasterTradeSkills:SortTooltipItemGroups(groups)
+    table.sort(groups, function(a, b)
+        local a_rank = a.my_profession_rank or 0
+        local b_rank = b.my_profession_rank or 0
+        if a_rank ~= b_rank and (a_rank == 0 or b_rank == 0) then
+            return a_rank > b_rank
+        end
+        return a.localized_profession_name < b.localized_profession_name
+    end)
 
-                            -- Add the tooltip
-                            MTS_TOOLTIP_SKILLEVEL = 0;
-                            for i=1,5 do
-                                if(skilllevel_color== skill_level_to_color[i]) then
-                                    MTS_TOOLTIP_SKILLEVEL = i;
-                                    if self.options.SortingOptions.NotLearnedSkillsLast then
-                                        if (MTS_TOOLTIP_SKILLEVEL == 5) then MTS_TOOLTIP_SKILLEVEL = 0; end
-                                    end
-                                end
-                            end
-                        if (MTS_ShowTooltip == true) then
-                            totalcount = totalcount+1
-                            table.insert(MTS_TOOLTIP_DB, {skilllvl=MTS_TOOLTIP_SKILLEVEL,{name=Recipes, textl=textleft, textr=textright}});
-                        end
-                    end
+    for _, group in ipairs(groups) do
+        table.sort(group.items, function(a, b)
+            if self.db_options.SortingOptions.NotLearnedSkillsLast then
+                local a_learned = a.difficulty ~= nil
+                local b_learned = b.difficulty ~= nil
+                if a_learned ~= b_learned then
+                    return a_learned
                 end
             end
 
-            -- TODO sort not only by COLOR but by real skill level
-            -- TODO sort and THEN limit count
-            -- TODO sort by lvl then by some other criteria
-            local compare
-            if self.options.SortingOptions.HigherLevelSkillsFirst then
-                compare = function (a, b) return a.skilllvl > b.skilllvl end
-            else
-                compare = function (a, b) return a.skilllvl < b.skilllvl end
-            end
-            table.sort(MTS_TOOLTIP_DB, compare);
-
-            for i=1, table.getn(MTS_TOOLTIP_DB) do
-                for j=1, table.getn(MTS_TOOLTIP_DB[i]) do
-                    frame:AddDoubleLine(MTS_TOOLTIP_DB[i][j].textl, MTS_TOOLTIP_DB[i][j].textr);
+            if a.required_rank ~= b.required_rank then
+                if self.db_options.SortingOptions.HigherLevelSkillsFirst then
+                    return a.required_rank > b.required_rank
+                else
+                    return a.required_rank < b.required_rank
                 end
             end
-            MTS_TOOLTIP_DB = {};
-        end
+
+            return a.localized_name < b.localized_name
+        end)
     end
 end
 
-function MasterTradeSkills_Write(chat_text)
-    DEFAULT_CHAT_FRAME:AddMessage(chat_text, 0.0, 1.0, 0.0);
+---@param groups TooltipItemGroup[]
+---@return TooltipItemGroup[]
+function MasterTradeSkills:LimitTooltipItemGroups(groups)
+    local item_count_total = 0
+    ---@type number[]
+    local item_count_by_groups = {}
+    for _, group in ipairs(groups) do
+        local n = getn(group.items)
+        tinsert(item_count_by_groups, n)
+        item_count_total = item_count_total + n
+    end
+
+    local item_count_limit = self.db_options.HowManySkillsToShow
+    if item_count_total <= item_count_limit then
+        return groups
+    end
+
+    local new_item_count_total = 0
+    local new_groups = {}
+    for i, group in ipairs(groups) do
+        local group_weight = item_count_by_groups[i] / item_count_total
+        local group_size = ceil(group_weight * item_count_limit)
+        local new_items = {}
+        for j, item in ipairs(group.items) do
+            if j <= group_size and new_item_count_total < item_count_limit then
+                tinsert(new_items, item)
+                new_item_count_total = new_item_count_total + 1
+            end
+        end
+        group.items = new_items
+        if getn(group.items) > 0 then
+            tinsert(new_groups, group)
+        end
+    end
+
+    return new_groups
 end
 
-function MasterTradeSkills_ReadRecipes()
-    local tradeskill, trade_rank = GetTradeSkillLine();
-    if (MasterTradeSkill_IsTradeSkill(tradeskill)) then
-        for i=1, GetNumTradeSkills() do
-            local crafted_object, skill_type = GetTradeSkillInfo(i);
-            if (MTS_DATA[tradeskill] == nil) then
-                MTS_DATA[tradeskill] = {};
+---@param tooltip_frame GameTooltip
+---@param groups TooltipItemGroup[]
+function MasterTradeSkills:DrawTooltipItemGroups(tooltip_frame, groups)
+    ---@type table<string, string>
+    local difficulty_to_color = {
+        ["trivial"] = "|cFFA0A0A0",
+        ["easy"] = "|cFF40C040",
+        ["medium"] = "|cFFFFEE00",
+        ["optimal"] = "|cFFFF9900",
+        ["difficult"] = "|cFFFF0000",
+    }
+
+    for _, group in ipairs(groups) do
+        local my_rank = group.my_profession_rank or 0
+        local my_rank_text = my_rank > 0 and format(" (%d)", my_rank) or ""
+
+        local prof_color = "|cFF00FF11"
+        local prof_text_left = format("%s%s|r", prof_color, L.txt_recipes)
+        local prof_text_right = format("%s%s%s|r", prof_color, group.localized_profession_name, my_rank_text)
+        tooltip_frame:AddDoubleLine(prof_text_left, prof_text_right)
+
+        local source_color = "|cFF56B59D"
+        for _, item in ipairs(group.items) do
+            local other_characters_text = ""
+            if self.db_options.ShowAltName then
+                for character, difficulty in pairs(item.other_character_to_difficulty) do
+                    local indent = other_characters_text == "" and "" or "  "
+                    other_characters_text = other_characters_text .. indent .. format("%s[%s]|r", difficulty_to_color[difficulty], character)
+                end
             end
-            if (MTS_DATA[tradeskill][crafted_object] == nil) then
-                MTS_DATA[tradeskill][crafted_object] = {};
-                MTS_DATA[tradeskill][crafted_object].LearntBy = {};
-                MTS_DATA[tradeskill][crafted_object].LearntBy[MTS_CHAR_INDEX] = skill_type;
+
+            local skill_color = difficulty_to_color[item.difficulty or "difficult"]
+
+            local item_text_left = format("|cFFFFB444 %s|r%s%s|r",
+                item.is_reagent and '+' or '-',
+                skill_color,
+                item.localized_name)
+
+            local item_text_right = ""
+            if other_characters_text ~= "" then
+                item_text_right = other_characters_text
             else
-                MTS_DATA[tradeskill][crafted_object].LearntBy[MTS_CHAR_INDEX] = skill_type;
+                item_text_right = format("%s%s|r %s(%d)|r",
+                    source_color,
+                    item.localized_source,
+                    skill_color,
+                    item.required_rank)
             end
+
+            tooltip_frame:AddDoubleLine(item_text_left, item_text_right)
         end
     end
 end
 
-function MasterTradeSkills_ReadCrafts()
-    local tradeskill, trade_rank = GetCraftDisplaySkillLine();
-    if (tradeskill and MasterTradeSkill_IsTradeSkill(tradeskill)) then
-        for i=1, GetNumCrafts() do
-            local crafted_object, craftSubSpellName, skill_type = GetCraftInfo(i);
-
-            if (MTS_DATA[tradeskill] == nil) then
-                MTS_DATA[tradeskill] = {};
-            end
-            if (MTS_DATA[tradeskill][crafted_object] == nil) then
-                MTS_DATA[tradeskill][crafted_object] = {};
-                MTS_DATA[tradeskill][crafted_object].LearntBy = {};
-                MTS_DATA[tradeskill][crafted_object].LearntBy[MTS_CHAR_INDEX] = skill_type;
-            else
-                MTS_DATA[tradeskill][crafted_object].LearntBy[MTS_CHAR_INDEX] = skill_type;
-            end
-        end
-    end
-end
-
-function MasterTradeSkills_GetSkillLevel(skill)
-    local tradeSkillsNum = GetNumSkillLines();
-    local MTS_GetSkillLevel = 0;
-
-    for i=1,tradeSkillsNum do
-        local skillName, header, isExpanded, skillRank, numTempPoints, skillModifier, skillMaxRank, isAbandonable, stepCost, rankCost, minLevel, skillCostType, skillDescription = GetSkillLineInfo(i);
-        if (skillName == skill) then
-            MTS_GetSkillLevel = skillRank;
-        end
-    end
-
-    return MTS_GetSkillLevel;
-end
-
-function MasterTradeSkill_IsTradeSkill(skill)
-    local MTS_IsTradeSkill = 0;
-    local MTS_Max = table.getn(MTS_TRADESKILLS);
-    for i=1, MTS_Max do
-        if (skill == MTS_TRADESKILLS[i]) then
-            MTS_IsTradeSkill = i;
-        end
-    end
-    return MTS_IsTradeSkill
+function MasterTradeSkills:Print(text)
+    DEFAULT_CHAT_FRAME:AddMessage(text, 0.0, 1.0, 0.0);
 end

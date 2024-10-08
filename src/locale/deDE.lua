@@ -1,8 +1,10 @@
+setfenv(1, MasterTradeSkills)
+
 local L = --[[---@type MasterTradeSkillsLocale]] MasterTradeSkills_Utils:NewLocale("deDE", false)
 if L == nil then return end
 
-L.txt_addon_loaded = "Master Trade Skills v".. MTS_VERSION .. " AddOn geladen"
-L.txt_locale_missing = "Bitte informiere Triadian dass die Lokalisierung fehlt f\195\188r: %s"
+L.txt_addon_loaded = "Master Trade Skills v".. MtsAddonVersion .. " AddOn geladen"
+L.txt_missing_locale = "Bitte informieren Sie Refaim, dass das Gebietsschema für \"%s\" fehlt: https://github.com/refaim/MasterTradeSkills/issues/new"
 L.txt_open_options = "Offene Optionen"
 
 L.txt_option_group_enable = "Aktivieren"
@@ -23,6 +25,7 @@ L.txt_option_group_details = "Einzelheiten"
 L.txt_option_show_learned = "Bereits bekannte Rezepte anzeigen"
 L.txt_option_show_not_learned = "Nicht bekannte Rezepte anzeigen"
 L.txt_option_show_alt_name = "Charnamen zeigen"
+L.txt_option_show_cross_faction_alts = "Show cross-faction alts"
 L.txt_option_how_many_skills_to_show = "Max. Zeilenanzahl die im Tooltip angezeigt wird"
 
 L.txt_option_group_sorting = "Sortierung"
@@ -35,17 +38,6 @@ L.txt_source_trainer = "Lehrer"
 L.txt_source_drop = "Drop"
 L.txt_source_quest = "Quest"
 L.txt_source_unknown = "Unbekannt"
-
-L.txt_trade_skill_cooking = "Kochkunst"
-L.txt_trade_skill_tailoring = "Schneiderei"
-L.txt_trade_skill_enchanting = "Verzauberkunst"
-L.txt_trade_skill_leatherworking = "Lederverarbeitung"
-L.txt_trade_skill_blacksmithing = "Schmiedekunst"
-L.txt_trade_skill_alchemy = "Alchimie"
-L.txt_trade_skill_engineering = "Ingenieurskunst"
-L.txt_trade_skill_first_aid = "Erste Hilfe"
-L.txt_trade_skill_mining = "Bergbau"
-L.txt_trade_skill_poisons = "Gifte"
 
 local T = --[[---@type table<string, string>]] L
 T["Accurate Scope"] = "Genaues Zielfernrohr"

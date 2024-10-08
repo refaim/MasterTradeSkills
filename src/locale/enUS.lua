@@ -1,7 +1,9 @@
+setfenv(1, MasterTradeSkills)
+
 local L = --[[---@type MasterTradeSkillsLocale]] MasterTradeSkills_Utils:NewLocale("enUS", true)
 
-L.txt_addon_loaded = format("Master Trade Skills v%s AddOn loaded", MTS_VERSION)
-L.txt_locale_missing = "Please inform Triadian that the locale is missing for %s"
+L.txt_addon_loaded = format("Master Trade Skills v%s AddOn loaded", MtsAddonVersion)
+L.txt_missing_locale = "Please inform Refaim that the locale for \"%s\" is missing: https://github.com/refaim/MasterTradeSkills/issues/new"
 L.txt_open_options = "Open options"
 
 L.txt_option_group_enable = "Enable"
@@ -12,7 +14,6 @@ L.txt_option_enhance_minimap_nodes_tooltips = "Enhance minimap nodes tooltips"
 L.txt_option_group_trade_skills = "Trade Skills"
 
 L.txt_option_group_skill_difficulty = "Skill Difficulty"
--- TODO move color from translations to options UI
 L.txt_option_show_trivial = "Show |cFFA0A0A0Trivial"
 L.txt_option_show_easy = "Show |cFF40C040Easy"
 L.txt_option_show_medium = "Show |cFFFFEE00Medium"
@@ -22,7 +23,8 @@ L.txt_option_show_difficult = "Show |cFFFF0000Difficult"
 L.txt_option_group_details = "Details"
 L.txt_option_show_learned = "Show learned skills"
 L.txt_option_show_not_learned = "Show skills which aren't learned"
-L.txt_option_show_alt_name = "Show Alt Name"
+L.txt_option_show_alt_name = "Show alt name"
+L.txt_option_show_cross_faction_alts = "Show cross-faction alts"
 L.txt_option_how_many_skills_to_show = "How many skills to show in the tooltip"
 
 L.txt_option_group_sorting = "Sorting"
@@ -35,18 +37,6 @@ L.txt_source_trainer = "Trainer"
 L.txt_source_drop = "Drop"
 L.txt_source_quest = "Quest"
 L.txt_source_unknown = "Unknown"
-
--- TODO get from TradeSkillsData
-L.txt_trade_skill_cooking = "Cooking"
-L.txt_trade_skill_tailoring = "Tailoring"
-L.txt_trade_skill_enchanting = "Enchanting"
-L.txt_trade_skill_leatherworking = "Leatherworking"
-L.txt_trade_skill_blacksmithing = "Blacksmithing"
-L.txt_trade_skill_alchemy = "Alchemy"
-L.txt_trade_skill_engineering = "Engineering"
-L.txt_trade_skill_first_aid = "First Aid"
-L.txt_trade_skill_mining = "Mining"
-L.txt_trade_skill_poisons = "Poisons"
 
 local T = --[[---@type table<string, string>]] L
 T["Accurate Scope"] = "Accurate Scope"

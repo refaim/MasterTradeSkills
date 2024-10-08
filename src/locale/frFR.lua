@@ -1,8 +1,10 @@
+setfenv(1, MasterTradeSkills)
+
 local L = --[[---@type MasterTradeSkillsLocale]] MasterTradeSkills_Utils:NewLocale("frFR", false)
 if L == nil then return end
 
-L.txt_addon_loaded = "Master Trade Skills v".. MTS_VERSION .. " AddOn charg\195\169"
-L.txt_locale_missing = "Informer Triadian que la traduction manque pour: %s"
+L.txt_addon_loaded = "Master Trade Skills v".. MtsAddonVersion .. " AddOn charg\195\169"
+L.txt_missing_locale = "Veuillez informer Refaim que les paramètres régionaux pour \"%s\" sont manquants: https://github.com/refaim/MasterTradeSkills/issues/new"
 L.txt_open_options = "Options ouvertes"
 
 L.txt_option_group_enable = "Activer"
@@ -23,6 +25,7 @@ L.txt_option_group_details = "Détails"
 L.txt_option_show_learned = "Afficher les recettes connues"
 L.txt_option_show_not_learned = "Afficher les recettes iconnues"
 L.txt_option_show_alt_name = "Montrer nom du perso"
+L.txt_option_show_cross_faction_alts = "Show cross-faction alts"
 L.txt_option_how_many_skills_to_show = "Lignes Max. \195\160 afficher dans le tooltip"
 
 L.txt_option_group_sorting = "Tri"
@@ -35,17 +38,6 @@ L.txt_source_trainer = "Instructeur"
 L.txt_source_drop = "Ramass\195\169"
 L.txt_source_quest = "Qu\195\170te"
 L.txt_source_unknown = "Inconnu"
-
-L.txt_trade_skill_cooking = "Cuisine"
-L.txt_trade_skill_tailoring = "Couture"
-L.txt_trade_skill_enchanting = "Enchantement"
-L.txt_trade_skill_leatherworking = "Travail du cuir"
-L.txt_trade_skill_blacksmithing = "Forge"
-L.txt_trade_skill_alchemy = "Alchimie"
-L.txt_trade_skill_engineering = "Ingeni\195\169rie"
-L.txt_trade_skill_first_aid = "Secourisme"
-L.txt_trade_skill_mining = "Minage"
-L.txt_trade_skill_poisons = "Poisons"
 
 local T = --[[---@type table<string, string>]] L
 T["Accurate Scope"] = "Lunette de pr\195\169cision"

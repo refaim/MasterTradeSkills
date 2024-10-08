@@ -840,7 +840,6 @@ function AceConfigCmd:CreateChatCommand(slashcmd, appName, func)
 	end
 
 	if AceConsole.RegisterChatCommand(self, slashcmd, handler, true) then
-		print("CATCH!!!")
 		-- succesfully registered so lets get the command -> app table in
 		commands[slashcmd] = appName
 	end

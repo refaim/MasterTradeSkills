@@ -1,6 +1,6 @@
 ---@shape MasterTradeSkillsLocale
 ---@field txt_addon_loaded string
----@field txt_locale_missing string
+---@field txt_missing_locale string
 ---@field txt_open_options string
 ---@field txt_option_group_enable string
 ---@field txt_option_enhance_tooltips string
@@ -17,6 +17,7 @@
 ---@field txt_option_show_learned string
 ---@field txt_option_show_not_learned string
 ---@field txt_option_show_alt_name string
+---@field txt_option_show_cross_faction_alts string
 ---@field txt_option_how_many_skills_to_show string
 ---@field txt_option_group_sorting string
 ---@field txt_option_not_learned_skills_last string
@@ -27,13 +28,3 @@
 ---@field txt_source_drop string
 ---@field txt_source_quest string
 ---@field txt_source_unknown string
----@field txt_trade_skill_cooking string
----@field txt_trade_skill_tailoring string
----@field txt_trade_skill_enchanting string
----@field txt_trade_skill_leatherworking string
----@field txt_trade_skill_blacksmithing string
----@field txt_trade_skill_alchemy string
----@field txt_trade_skill_engineering string
----@field txt_trade_skill_first_aid string
----@field txt_trade_skill_mining string
----@field txt_trade_skill_poisons string

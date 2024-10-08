@@ -1,8 +1,11 @@
+setfenv(1, MasterTradeSkills)
+
 ---@type LibStubDef
 local LibStub = getglobal("LibStub")
 assert(LibStub ~= nil, "Cannot find instance of a LibStub")
 
-local AceConfigDialog = --[[---@type LibAceConfigDialogDef]] LibStub("AceConfigDialog-3.0")
+local AceConfigDialog, _ = LibStub("AceConfigDialog-3.0")
+local LibCraftingProfessions = --[[---@type LibCraftingProfessions]] LibStub("LibCraftingProfessions-1.0")
 
 ---@class MasterTradeSkills_Options
 ---@field __application string
@@ -12,28 +15,28 @@ MasterTradeSkills_Options = {}
 ---@param db MasterTradeSkillsDBOptions
 ---@return table<string, table>
 local function GetSortedTradeSkillsOptionsTable(db)
-    ---@param a {id: string, name: string}
-    ---@param b {id: string, name: string}
+    ---@param a LcpProfession
+    ---@param b LcpProfession
     ---@return boolean
     local function compare(a, b)
-        return a.name < b.name
+        return a.localized_name < b.localized_name
     end
 
-    local trade_skills = MasterTradeSkills_Database:GetTradeSkills()
+    local trade_skills = LibCraftingProfessions:GetSupportedProfessions()
     table.sort(trade_skills, compare)
 
     ---@type table<string, table>
     local options = {}
     for i, trade_skill in ipairs(trade_skills) do
-        options[trade_skill.id] = {
+        options[trade_skill.localized_name] = {
             order = i,
             type = "toggle",
-            name = trade_skill.name,
-            ---@param info {option: {arg: ProfessionId}}
+            name = trade_skill.localized_name,
+            ---@param info {option: {arg: string}}
             get = function(info) return db.ShowSkillsByTradeSkill[info.option.arg] end,
-            ---@param info {option: {arg: ProfessionId}}
+            ---@param info {option: {arg: string}}
             set = function(info, value) db.ShowSkillsByTradeSkill[info.option.arg] = value end,
-            arg = trade_skill.id,
+            arg = trade_skill.localized_name,
         }
     end
 
@@ -47,7 +50,7 @@ local function MakeOptionsTable(L, db)
     local trade_skills_options_table = GetSortedTradeSkillsOptionsTable(db)
     return {
         type = "group",
-        name = format("%s v%s", MTS_NAME, MTS_VERSION),
+        name = format("%s v%s", MtsAddonName, MtsAddonVersion),
         args = {
             Enable = {
                 order = 0,
@@ -154,8 +157,15 @@ local function MakeOptionsTable(L, db)
                         get = function(info) return db.ShowAltName end,
                         set = function(info, value) db.ShowAltName = value end,
                     },
-                    HowManySkillsToShow = {
+                    ShowCrossFactionAlts = {
                         order = 4,
+                        type = "toggle",
+                        name = L.txt_option_show_cross_faction_alts,
+                        get = function(info) return db.ShowCrossFactionAlts end,
+                        set = function(info, value) db.ShowCrossFactionAlts = value end,
+                    },
+                    HowManySkillsToShow = {
+                        order = 5,
                         type = "range",
                         name = L.txt_option_how_many_skills_to_show,
                         width = "full",
@@ -206,7 +216,7 @@ end
 local function SupportClosingWithEscape(app_name, frame)
     local name = app_name .. "OptionsFrame"
     setglobal(name, frame)
-    tinsert(UISpecialFrames, name)
+    tinsert(UISpecialFrames, name) -- close with Escape key
 end
 
 ---@param L MasterTradeSkillsLocale
@@ -218,7 +228,7 @@ function MasterTradeSkills_Options:Initialize(L, application, database, AceConfi
     AceConfigDialog:AddToBlizOptions(application)
     self.__application = application
 
-    local AceGUI = --[[---@type LibAceGUIDef]] LibStub("AceGUI-3.0")
+    local AceGUI, _ = LibStub("AceGUI-3.0")
     local frame = AceGUI:Create("Frame")
     AceConfigDialog:Open(application, frame)
     frame:Hide()

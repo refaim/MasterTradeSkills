@@ -1,7 +1,9 @@
+setfenv(1, MasterTradeSkills)
+
 ---@class MasterTradeSkills_LegacyDatabase
 MasterTradeSkills_LegacyDatabase = {}
 
----@shape MasterTradeSkillsLegacyDBOptions
+---@shape _MtsLegacyDBOptions
 ---@field MTS_STATE number|nil
 ---@field MTS_SHOWONSHIFTKEYDOWN number|nil
 ---@field MTS_MOUSEOVER number|nil
@@ -18,26 +20,40 @@ MasterTradeSkills_LegacyDatabase = {}
 ---@field MTS_NUMTOSHOW number
 ---@field MTS_SHOW_TRADESKILLS table<number, number>
 
----@shape MasterTradeSkillsLegacyDBCharacter
+---@shape _MtsLegacyDBCharacter
 ---@field Name string
 ---@field Realm string
 ---@field Faction string
----@field Options MasterTradeSkillsLegacyDBOptions
+---@field Options _MtsLegacyDBOptions
 
----@alias MasterTradeSkillsLegacyDB {Characters: MasterTradeSkillsLegacyDBCharacter[]}
+---@alias _MtsLegacyTradeSkill table<string, {LearntBy: table<number, string>}>
+
+---@shape _MtsLegacyDB
+---@field Characters _MtsLegacyDBCharacter[]
+
+local INDEX_TO_TRADE_SKILL = {
+    [1] = "Cooking",
+    [2] = "Tailoring",
+    [3] = "Enchanting",
+    [4] = "Leatherworking",
+    [5] = "Blacksmithing",
+    [6] = "Alchemy",
+    [7] = "Engineering",
+    [8] = "First Aid",
+    [9] = "Mining",
+    [10] = "Poisons",
+}
 
 ---@param defaults MasterTradeSkillsDBOptions
 ---@return MasterTradeSkillsDBOptions|nil
 function MasterTradeSkills_LegacyDatabase:ImportOptions(defaults)
     local name, _ = UnitName("player")
-    assert(name ~= nil)
     local realm = GetRealmName()
-    assert(realm ~= nil)
     local faction, _ = UnitFactionGroup("player")
 
-    ---@type MasterTradeSkillsLegacyDBCharacter
+    ---@type _MtsLegacyDBCharacter
     local player
-    ---@type MasterTradeSkillsLegacyDB
+    ---@type _MtsLegacyDB
     local database = getglobal("MTS_DATA")
     if type(database) ~= "table" then
         return nil
@@ -54,7 +70,7 @@ function MasterTradeSkills_LegacyDatabase:ImportOptions(defaults)
     end
 
     local ldb = player.Options
-    if type(ldb) ~= "table" or MasterTradeSkills_Utils:IsTableEmpty(ldb) then
+    if type(ldb) ~= "table" or next(ldb) == nil then
         return nil
     end
 
@@ -67,14 +83,14 @@ function MasterTradeSkills_LegacyDatabase:ImportOptions(defaults)
         return n == 1
     end
 
-    ---@type table<ProfessionId, boolean>
+    ---@type table<string, boolean>
     local ShowSkillsByTradeSkill = {}
-    for i, trade_skill_id in pairs(MTS_TSD_PROFESSION_ID) do
-        ShowSkillsByTradeSkill[trade_skill_id] = to_boolean(ldb.MTS_SHOW_TRADESKILLS[i], defaults.ShowSkillsByTradeSkill[trade_skill_id])
+    for i, trade_skill in pairs(INDEX_TO_TRADE_SKILL) do
+        ShowSkillsByTradeSkill[trade_skill] = to_boolean(ldb.MTS_SHOW_TRADESKILLS[i], defaults.ShowSkillsByTradeSkill[trade_skill])
     end
-    for trade_skill_id, value in pairs(defaults.ShowSkillsByTradeSkill) do
-        if ShowSkillsByTradeSkill[trade_skill_id] == nil then
-            ShowSkillsByTradeSkill[trade_skill_id] = value
+    for trade_skill, value in pairs(defaults.ShowSkillsByTradeSkill) do
+        if ShowSkillsByTradeSkill[trade_skill] == nil then
+            ShowSkillsByTradeSkill[trade_skill] = value
         end
     end
 
@@ -82,6 +98,11 @@ function MasterTradeSkills_LegacyDatabase:ImportOptions(defaults)
     local EnhanceMinimapNodesTooltips = defaults.EnhanceMinimapNodesTooltips
     if type(ldb.MTS_MOUSEOVER) == "number" then
         EnhanceMinimapNodesTooltips = ldb.MTS_MOUSEOVER == 0
+    end
+
+    local how_many_skills_to_show = ldb.MTS_NUMTOSHOW or 0
+    if how_many_skills_to_show < 1 or how_many_skills_to_show > 100 then
+        how_many_skills_to_show = defaults.HowManySkillsToShow
     end
 
     ---@type MasterTradeSkillsDBOptions
@@ -106,10 +127,17 @@ function MasterTradeSkills_LegacyDatabase:ImportOptions(defaults)
             NotLearnedSkillsLast = to_boolean(ldb.MTS_UNKNOWNTOBOTTOM, defaults.SortingOptions.NotLearnedSkillsLast),
         },
         ShowAltName = to_boolean(ldb.MTS_ALTNAME, defaults.ShowAltName),
-        HowManySkillsToShow = ldb.MTS_NUMTOSHOW or defaults.HowManySkillsToShow,
+        ShowCrossFactionAlts = false,
+        HowManySkillsToShow = how_many_skills_to_show,
     }
 
-    player.Options = --[[---@type MasterTradeSkillsLegacyDBOptions]] {}
+    player.Options = --[[---@type _MtsLegacyDBOptions]] {}
 
     return imported_options
+end
+
+function MasterTradeSkills_LegacyDatabase:Clear()
+    ---@type table<string, any>
+    local G = getfenv(0)
+    G['MTS_DATA'] = nil
 end

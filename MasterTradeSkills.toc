@@ -1,25 +1,26 @@
 ## Interface: 11200
 ## Title: MasterTradeSkills
-## Notes: This AddOn adjusts the display of the tooltips to show which recipe is being used by the item your hovering above
-## Notes-ruRU: Это дополнение настраивает отображение всплывающих подсказок, чтобы показать, какой рецепт используется предметом, над которым вы наводите курсор.
-## Author: DaDaemon, Triadian, Farook, Refaim
-## Version: 1.12.4
-## Dependencies: ReagentData, TradeSkillsData
-## OptionalDeps: TradeSkillsData-turtle
+## Notes: This addon customizes the tooltip display to show which recipe uses the item your hovering above
+## Notes-ruRU: Этот аддон настраивает отображение подсказок, чтобы показать, в каком рецепте используется предмет, на который вы навели курсор
+## Author: DaDaemon, Triadian, Refaim
+## Version: 2.0
+## Dependencies: ReagentData
 ## SavedVariables: MTS_DATA, MasterTradeSkillsData
 
 lib\LibStub\LibStub.lua
 lib\CallbackHandler-1.0\CallbackHandler-1.0.xml
+lib\LibCraftingProfessions-1.0\LibCraftingProfessions-1.0.xml
+
 lib\AceCore-3.0\AceCore-3.0.xml
 lib\AceLocale-3.0\AceLocale-3.0.xml
 lib\AceDB-3.0\AceDB-3.0.xml
 lib\AceHook-3.0\AceHook-3.0.xml
-lib\AceEvent-3.0\AceEvent-3.0.xml
 lib\AceAddon-3.0\AceAddon-3.0.xml
 lib\AceGUI-3.0\AceGUI-3.0.xml
 lib\AceConsole-3.0\AceConsole-3.0.xml
 lib\AceConfig-3.0\AceConfig-3.0.xml
 
+src\Environment.lua
 src\GlobalVariables.lua
 src\Utils.lua
 src\locale\enUS.lua

@@ -2,7 +2,7 @@
 TreeGroup Container
 Container that uses a tree control to switch between groups.
 -------------------------------------------------------------------------------]]
-local Type, Version = "TreeGroup", 41
+local Type, Version = "TreeGroup", 42
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -354,7 +354,7 @@ methods = {
 		toggle:SetScript("OnClick", Button_OnClick)
 		toggle:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-UP")
 		toggle:SetPushedTexture("Interface\\Buttons\\UI-MinusButton-DOWN")
-		toggle:SetHighlightTexture("Interface\Buttons\UI-PlusButton-Hilight", "ADD")
+		toggle:SetHighlightTexture("Interface\\Buttons\\UI-PlusButton-Hilight", "ADD")
 
 		local text = button:CreateFontString()
 		button.text = text
