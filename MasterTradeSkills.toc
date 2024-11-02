@@ -3,13 +3,15 @@
 ## Notes: This addon customizes the tooltip display to show which recipe uses the item your hovering above
 ## Notes-ruRU: Этот аддон настраивает отображение подсказок, чтобы показать, в каком рецепте используется предмет, на который вы навели курсор
 ## Author: DaDaemon, Triadian, Refaim
-## Version: 2.0
-## Dependencies: ReagentData
+## Version: 2.1
 ## SavedVariables: MTS_DATA, MasterTradeSkillsData
 
 lib\LibStub\LibStub.lua
 lib\CallbackHandler-1.0\CallbackHandler-1.0.xml
+
 lib\LibCraftingProfessions-1.0\LibCraftingProfessions-1.0.xml
+lib\LibCrafts-1.0\LibCrafts-1.0.xml
+lib\LibItemTooltip-1.0\LibItemTooltip-1.0.xml
 
 lib\AceCore-3.0\AceCore-3.0.xml
 lib\AceLocale-3.0\AceLocale-3.0.xml

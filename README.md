@@ -1,6 +1,3 @@
-### Required addons
-- [ReagentData](https://github.com/refaim/ReagentData)
-
 ### Description
 This addon is an information tool for all you trade skill loving fools! It will alter the tooltips of ingredients and tells you the following things:
 
@@ -26,7 +23,7 @@ You can open addon settings with `/mts options` slash command.
 ### Acknowledgments
 - Original version: DaDaemon
 - [Resurrection and reupload](https://www.curseforge.com/wow/addons/project-2618): [Triadian](https://github.com/Triadian)
-- [Ace3v](https://github.com/laytya/Ace3v/) rewrite: [Refaim](https://github.com/refaim)
+- [Ace3v](https://github.com/laytya/Ace3v/) and [LibCrafts](https://github.com/refaim/LibCrafts-1.0) rewrite: [Refaim](https://github.com/refaim)
 - German Localization: Farook
 - French Localization: Tigaa
 - Russian Localization: [KasVital](https://github.com/KasVital), [Refaim](https://github.com/refaim)

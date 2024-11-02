@@ -3,7 +3,7 @@
     Developed by: Refaim (rkharito@yandex.ru, https://github.com/refaim/)
     Website: https://github.com/refaim/LibCraftingProfessions-1.0
     Description: A library designed to provide a universal interface for crafting professions.
-    Dependencies: None
+    Dependencies: LibStub
     Compatibility: World of Warcraft Vanilla (1.12.1)
 ]]
 
@@ -11,14 +11,19 @@
 local LibStub = getglobal("LibStub")
 assert(LibStub ~= nil)
 
-local library, _ = LibStub:NewLibrary("LibCraftingProfessions-1.0", 1)
-if not library then
+local untyped_lib, _ = LibStub:NewLibrary("LibCraftingProfessions-1.0", 2)
+if not untyped_lib then
     return
 end
 
 ---@class LibCraftingProfessions
+---@field event_to_handlers table<string, function[]>
+---@field event_frame Frame
 
-local LibCraftingProfessions = --[[---@type LibCraftingProfessions]] library
+local lib = --[[---@type LibCraftingProfessions]] untyped_lib
+if lib.event_to_handlers == nil then
+    lib.event_to_handlers = {}
+end
 
 ---@type table<string, boolean>
 local ALL_EXISTING_CRAFTING_PROFESSIONS_SET = {
@@ -58,8 +63,6 @@ local LOCALIZED_TO_ENGLISH = {}
 
 ---@type table<string, LcpKnownSkill[]>
 local skills_by_english_profession_name = {}
----@type table<string, LcpScanSkillsHandler[]>
-local skill_scan_handlers = {}
 
 ---@return boolean
 local function ready(value)
@@ -76,7 +79,7 @@ end
 --- Retrieves a list of all supported crafting professions in the game.
 ---
 ---@return LcpProfession[]
-function LibCraftingProfessions:GetSupportedProfessions()
+function lib:GetSupportedProfessions()
     ---@type LcpProfession[]
     local professions = {}
     for english_name, _ in pairs(ALL_EXISTING_CRAFTING_PROFESSIONS_SET) do
@@ -91,7 +94,7 @@ end
 --- Use RegisterEvent("LCP_SKILLS_UPDATE", ...) to ensure data availability.
 ---
 ---@return LcpKnownProfession[]|nil
-function LibCraftingProfessions:GetPlayerProfessions()
+function lib:GetPlayerProfessions()
     local num_of_professions = GetNumSkillLines()
     if not ready(num_of_professions) then
         return nil
@@ -128,7 +131,7 @@ end
 ---
 --- @param profession_name string
 --- @return LcpKnownSkill[]|nil
-function LibCraftingProfessions:GetPlayerProfessionSkills(profession_name)
+function lib:GetPlayerProfessionSkills(profession_name)
     return skills_by_english_profession_name[profession_name] or skills_by_english_profession_name[LOCALIZED_TO_ENGLISH[profession_name]]
 end
 
@@ -137,11 +140,11 @@ end
 ---
 ---@param event "LCP_SKILLS_UPDATE" @ The event to register for. This event is fired when skill data is updated and ready.
 ---@param handler fun(profession: LcpKnownProfession, skills: LcpKnownSkill[]):void @ The function to call when the event is triggered.
-function LibCraftingProfessions:RegisterEvent(event, handler)
-    if skill_scan_handlers[event] == nil then
-        skill_scan_handlers[event] = {}
+function lib:RegisterEvent(event, handler)
+    if lib.event_to_handlers[event] == nil then
+        lib.event_to_handlers[event] = {}
     end
-    tinsert(skill_scan_handlers[event], handler)
+    tinsert(lib.event_to_handlers[event], --[[---@type function]] handler)
 end
 
 ---@shape _LcpTradeSkillFilterOption
@@ -248,7 +251,7 @@ end
 local function save_skills(english_name, skills)
     skills_by_english_profession_name[english_name] = skills
 
-    local known_professions = LibCraftingProfessions:GetPlayerProfessions()
+    local known_professions = lib:GetPlayerProfessions()
     forget_obsolete_professions(known_professions)
 
     local profession
@@ -262,7 +265,7 @@ local function save_skills(english_name, skills)
         return
     end
 
-    for _, handler in ipairs(skill_scan_handlers["LCP_SKILLS_UPDATE"] or {}) do
+    for _, handler in ipairs(lib.event_to_handlers["LCP_SKILLS_UPDATE"] or {}) do
         handler(profession, skills)
     end
 end
@@ -486,13 +489,17 @@ for english_name, localized_name in pairs(ENGLISH_TO_LOCALIZED) do
     LOCALIZED_TO_ENGLISH[localized_name] = english_name
 end
 
-local event_frame = CreateFrame("Frame")
-event_frame:SetScript("OnEvent", function()
+if lib.event_frame ~= nil then
+    lib.event_frame:UnregisterAllEvents()
+    lib.event_frame:SetScript("OnEvent", nil)
+end
+lib.event_frame = CreateFrame("Frame")
+lib.event_frame:SetScript("OnEvent", function()
     if event == "CRAFT_SHOW" then
         scan_craft_frame()
     elseif event == "TRADE_SKILL_SHOW" then
         scan_trade_skill_frame()
     end
 end)
-event_frame:RegisterEvent("CRAFT_SHOW")
-event_frame:RegisterEvent("TRADE_SKILL_SHOW")
+lib.event_frame:RegisterEvent("CRAFT_SHOW")
+lib.event_frame:RegisterEvent("TRADE_SKILL_SHOW")

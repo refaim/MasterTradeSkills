@@ -72,14 +72,6 @@ local function MakeOptionsTable(L, db)
                         get = function(info) return db.EnhanceTooltipsOnlyWhileShiftIsPressed end,
                         set = function(info, value) db.EnhanceTooltipsOnlyWhileShiftIsPressed = value end,
                     },
-                    EnhanceMinimapNodesTooltips = {
-                        order = 2,
-                        type = "toggle",
-                        name = L.txt_option_enhance_minimap_nodes_tooltips,
-                        width = "full",
-                        get = function(info) return db.EnhanceMinimapNodesTooltips end,
-                        set = function(info, value) db.EnhanceMinimapNodesTooltips = value end,
-                    },
                 },
             },
             TradeSkills = {

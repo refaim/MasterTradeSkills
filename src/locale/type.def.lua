@@ -5,7 +5,6 @@
 ---@field txt_option_group_enable string
 ---@field txt_option_enhance_tooltips string
 ---@field txt_option_enhance_tooltips_shift string
----@field txt_option_enhance_minimap_nodes_tooltips string
 ---@field txt_option_group_trade_skills string
 ---@field txt_option_group_skill_difficulty string
 ---@field txt_option_show_trivial string
@@ -23,8 +22,14 @@
 ---@field txt_option_not_learned_skills_last string
 ---@field txt_option_higher_level_skills_first string
 ---@field txt_recipes string
----@field txt_source_vendor string
----@field txt_source_trainer string
+---@field txt_source_chest string
+---@field txt_source_craft string
 ---@field txt_source_drop string
+---@field txt_source_fishing string
+---@field txt_source_gift string
+---@field txt_source_pickpocketing string
 ---@field txt_source_quest string
+---@field txt_source_trainer string
 ---@field txt_source_unknown string
+---@field txt_source_vendor string
+---@field txt_source_world_object string

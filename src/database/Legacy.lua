@@ -94,12 +94,6 @@ function MasterTradeSkills_LegacyDatabase:ImportOptions(defaults)
         end
     end
 
-    -- Option was called "No Minimap Recipes", so we should inverse the value
-    local EnhanceMinimapNodesTooltips = defaults.EnhanceMinimapNodesTooltips
-    if type(ldb.MTS_MOUSEOVER) == "number" then
-        EnhanceMinimapNodesTooltips = ldb.MTS_MOUSEOVER == 0
-    end
-
     local how_many_skills_to_show = ldb.MTS_NUMTOSHOW or 0
     if how_many_skills_to_show < 1 or how_many_skills_to_show > 100 then
         how_many_skills_to_show = defaults.HowManySkillsToShow
@@ -109,7 +103,6 @@ function MasterTradeSkills_LegacyDatabase:ImportOptions(defaults)
     local imported_options = {
         EnhanceTooltips = to_boolean(ldb.MTS_STATE, defaults.EnhanceTooltips),
         EnhanceTooltipsOnlyWhileShiftIsPressed = to_boolean(ldb.MTS_SHOWONSHIFTKEYDOWN, defaults.EnhanceTooltipsOnlyWhileShiftIsPressed),
-        EnhanceMinimapNodesTooltips = EnhanceMinimapNodesTooltips,
         ShowSkillsByTradeSkill = ShowSkillsByTradeSkill,
         ShowSkillsByDifficulty = {
             Trivial = to_boolean(ldb.MTS_SHOWDIF1, defaults.ShowSkillsByDifficulty.Trivial),

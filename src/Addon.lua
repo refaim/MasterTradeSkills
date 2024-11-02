@@ -9,18 +9,17 @@ local AceAddon, _ = LibStub("AceAddon-3.0")
 ---@type AceAddonDef
 ---@field db MasterTradeSkills_Database
 ---@field options MasterTradeSkillsDBOptions
----@field reagent_to_profession_id_to_items table<string, table<string, string[]>>
----@field localized_known_crafting_profession_name_set table<string, boolean>
+---@field english_crafting_profession_name_to_localized table<string, string>
 local MasterTradeSkills = AceAddon:NewAddon(MtsAddonName, "AceConfig-3.0", "AceHook-3.0")
 
-local AceCore, _ = LibStub("AceCore-3.0")
 local AceDB, _ = LibStub("AceDB-3.0")
 
 local AceLocale, _ = LibStub("AceLocale-3.0")
 local L = --[[---@type MasterTradeSkillsLocale]] AceLocale:GetLocale(MtsAddonName, false)
-local LR = --[[---@type table<string, string>]] L
 
 local LibCraftingProfessions = --[[---@type LibCraftingProfessions]] LibStub("LibCraftingProfessions-1.0")
+local LibCrafts = --[[---@type LibCrafts]] LibStub("LibCrafts-1.0")
+local LibItemTooltip = --[[---@type LibItemTooltip]] LibStub("LibItemTooltip-1.0")
 
 ---@return LibAceConfigEmbedDef
 function MasterTradeSkills:AceConfig()
@@ -38,146 +37,38 @@ function MasterTradeSkills:OnInitialize()
     self.db_options = self.db:GetOptions()
     MasterTradeSkills_Options:Initialize(L, MtsAddonName, self.db_options, self:AceConfig())
 
-    local event_frame = CreateFrame("Frame", nil, GameTooltip)
-    event_frame:SetScript("OnShow", function()
-        self:PreHookGameTooltipOnShow()
-    end)
-    self:AceHook():SecureHook("SetItemRef", "PostHookSetItemRef")
-
     LibCraftingProfessions:RegisterEvent("LCP_SKILLS_UPDATE", function(profession, skills)
         self.db:SavePlayerSkills(profession, skills)
+    end)
+
+    LibItemTooltip:RegisterEvent("OnShow", function(tooltip, item_link, item_id)
+        self:OnItemTooltipShow(tooltip, item_link, item_id)
     end)
 end
 
 ---@return void
 function MasterTradeSkills:OnEnable()
-    self:LoadReagentData()
-
-    ---@type table<string, boolean>
-    local localized_crafting_profession_name_set = {}
+    ---@type table<string, string>
+    local english_crafting_profession_name_to_localized = {}
     for _, profession in ipairs(LibCraftingProfessions:GetSupportedProfessions()) do
-        localized_crafting_profession_name_set[profession.localized_name] = true
+        english_crafting_profession_name_to_localized[profession.english_name] = profession.localized_name
     end
-    self.localized_crafting_profession_name_set = localized_crafting_profession_name_set
+    self.english_crafting_profession_name_to_localized = english_crafting_profession_name_to_localized
 
     self:Print(L.txt_addon_loaded);
 end
 
----@return void
-function MasterTradeSkills:LoadReagentData()
-    ---@type table<string, fun():void>
-    local id_to_loader = {
-        alchemy = ReagentData_LoadAlchemy,
-        blacksmithing = ReagentData_LoadBlacksmithing,
-        cooking = ReagentData_LoadCooking,
-        enchanting = ReagentData_LoadEnchanting,
-        engineering = ReagentData_LoadEngineering,
-        firstaid = ReagentData_LoadFirstAid,
-        leatherworking = ReagentData_LoadLeatherworking,
-        mining = ReagentData_LoadMining,
-        poisons = ReagentData_LoadPoisons,
-        tailoring = ReagentData_LoadTailoring,
-    }
-
-    local reagent_data = self:GetReagentData()
-    for profession_id, loader in pairs(id_to_loader) do
-        if reagent_data['crafted'][profession_id] == nil then
-            loader()
-        end
-    end
-
-    ---@type table<string, table<string, string[]>>
-    local reagent_to_profession_to_items = {}
-    for profession_id, item_to_props in pairs(reagent_data['crafted']) do
-            for item, item_props in pairs(item_to_props) do
-                for reagent, _ in pairs(item_props['reagents']) do
-                    if reagent_to_profession_to_items[reagent] == nil then
-                        reagent_to_profession_to_items[reagent] = {}
-                    end
-                    if reagent_to_profession_to_items[reagent][profession_id] == nil then
-                        reagent_to_profession_to_items[reagent][profession_id] = {}
-                    end
-                tinsert(reagent_to_profession_to_items[reagent][profession_id], item)
-            end
-        end
-    end
-    self.localized_reagent_to_profession_id_to_en_items = reagent_to_profession_to_items
-end
-
----@shape ReagentDataItem
----@field skill number
----@field source string
----@field reagents table<string, number>
-
----@shape ReagentData
----@field crafted table<string, table<string, ReagentDataItem>>
----@field gathering table<string, string>
----@field professions table<string, string>
----@field reverseprofessions table<string, string>
-
----@return ReagentData
-function MasterTradeSkills:GetReagentData()
-    return --[[---@type ReagentData]] ReagentData
-end
-
----@return void
-function MasterTradeSkills:PostHookSetItemRef(link, text, button)
-    local prefix_supported = strsub(link, 1, strlen("item")) == "item"
-    if prefix_supported and not IsControlKeyDown() and not IsShiftKeyDown() then
-        local name, _, _, _, _, _, _, _, _ = GetItemInfo(link);
-        if name ~= nil and self:EnhanceTooltip(ItemRefTooltip, name) then
-            ItemRefTooltip:Show()
-        end
-    end
-end
-
----@return void
-function MasterTradeSkills:PreHookGameTooltipOnShow()
+---@param tooltip GameTooltip
+---@param item_link string
+---@param item_id number
+function MasterTradeSkills:OnItemTooltipShow(tooltip, item_link, item_id)
     local enhance = self.db_options.EnhanceTooltips
-        and (IsShiftKeyDown() or not self.db_options.EnhanceTooltipsOnlyWhileShiftIsPressed)
-        and (self.db_options.EnhanceMinimapNodesTooltips or not MouseIsOver(MinimapCluster))
-
-    if not enhance then
-        return
+    if tooltip == GameTooltip then
+        enhance = enhance and (IsShiftKeyDown() == 1 or not self.db_options.EnhanceTooltipsOnlyWhileShiftIsPressed)
     end
-
-    local item = self:ExtractItemFromTooltip()
-    if item ~= nil and self:EnhanceTooltip(GameTooltip, --[[---@not nil]] item) then
-        GameTooltip:Show()
+    if enhance and self:EnhanceTooltip(tooltip, item_id) then
+        tooltip:Show()
     end
-end
-
----@return string|nil
-function MasterTradeSkills:ExtractItemFromTooltip()
-    ---@type FontString|nil
-    local label = getglobal("GameTooltipTextLeft1")
-    if label == nil then
-        return nil
-    end
-
-    local text_or_nil = (--[[---@not nil]] label):GetText()
-    if text_or_nil == nil or text_or_nil == "" then
-        return nil
-    end
-
-    local text = --[[---@not nil]] text_or_nil
-    local subs = 0
-    for _, suffix in ipairs({"Vein", "Deposit"}) do
-        text, subs = gsub(text, suffix, "Ore")
-        if subs > 0 then
-            break
-        end
-    end
-    if strfind(text, "Ore", 1, true) ~= nil then
-        for _, prefix in ipairs({"Small", "Rich", "Ooze Covered"}) do
-            text, subs = gsub(text, prefix .. " ", "")
-            if subs > 0 then
-                break
-            end
-        end
-    end
-
-    return text
 end
 
 ---@shape TooltipItemGroup
@@ -187,17 +78,17 @@ end
 
 ---@shape TooltipItem
 ---@field localized_name string
----@field localized_source string
+---@field localized_sources string[]
 ---@field required_rank number
 ---@field is_reagent boolean
 ---@field difficulty string|nil
 ---@field other_character_to_difficulty table<string, string>
 
 ---@param tooltip GameTooltip
----@param item string
+---@param item_id number
 ---@return boolean
-function MasterTradeSkills:EnhanceTooltip(tooltip, item)
-    local groups = self:CreateTooltipItemGroups(item)
+function MasterTradeSkills:EnhanceTooltip(tooltip, item_id)
+    local groups = self:CreateTooltipItemGroups(item_id)
     groups = self:FilterTooltipItemGroups(groups)
     self:SortTooltipItemGroups(groups)
     groups = self:LimitTooltipItemGroups(groups)
@@ -208,16 +99,23 @@ function MasterTradeSkills:EnhanceTooltip(tooltip, item)
     return true
 end
 
----@param possible_reagent string
+---@param reagent_id number
 ---@return TooltipItemGroup[]
-function MasterTradeSkills:CreateTooltipItemGroups(possible_reagent)
-    ---@type table<string, string>
-    local en_source_to_localized_source = {
-        ["Drop"] = L.txt_source_drop,
-        ["Quest"] = L.txt_source_quest,
-        ["Trainer"] = L.txt_source_trainer,
-        ["Unknown"] = L.txt_source_unknown,
-        ["Vendor"] = L.txt_source_vendor,
+function MasterTradeSkills:CreateTooltipItemGroups(reagent_id)
+    ---@type table<LcSpellSource|LcRecipeSource, string>
+    local source_enum_to_string = {
+        [LibCrafts.constants.spell_sources.LearnedAutomatically] = L.txt_source_trainer,
+        [LibCrafts.constants.spell_sources.Quest] = L.txt_source_quest,
+        [LibCrafts.constants.spell_sources.Trainer] = L.txt_source_trainer,
+        [LibCrafts.constants.spell_sources.WorldObject] = L.txt_source_world_object,
+        [LibCrafts.constants.recipe_sources.Chest] = L.txt_source_chest,
+        [LibCrafts.constants.recipe_sources.CraftedByEngineer] = L.txt_source_craft,
+        [LibCrafts.constants.recipe_sources.Drop] = L.txt_source_drop,
+        [LibCrafts.constants.recipe_sources.Fishing] = L.txt_source_fishing,
+        [LibCrafts.constants.recipe_sources.GiftedToReturningEngineers] = L.txt_source_gift,
+        [LibCrafts.constants.recipe_sources.Pickpocketing] = L.txt_source_pickpocketing,
+        [LibCrafts.constants.recipe_sources.Quest] = L.txt_source_quest,
+        [LibCrafts.constants.recipe_sources.Vendor] = L.txt_source_vendor,
     }
 
     ---@type table<string, {rank: number|nil}>
@@ -226,52 +124,73 @@ function MasterTradeSkills:CreateTooltipItemGroups(possible_reagent)
         my_profession_localized_name_to_rank[profession.localized_name] = {["rank"] = profession.cur_rank}
     end
 
-    local reagent_data = self:GetReagentData()
+    ---@type table<string, LcCraft[]>
+    local localized_profession_to_crafts = {}
+    for _, craft in ipairs(LibCrafts:GetCraftsByReagentId(reagent_id)) do
+        local localized_profession_name = self.english_crafting_profession_name_to_localized[craft.en_profession_name]
+        local is_profession_enabled_in_tooltips = self.db_options.ShowSkillsByTradeSkill[localized_profession_name]
+        if is_profession_enabled_in_tooltips then
+            local crafts = localized_profession_to_crafts[localized_profession_name]
+            if crafts == nil then
+                crafts = {}
+                localized_profession_to_crafts[localized_profession_name] = crafts
+            end
+            tinsert(crafts, craft)
+        end
+    end
+
     local player_db = self.db:GetOrCreatePlayer()
     ---@type TooltipItemGroup[]
     local item_groups = {}
-    for profession_id, en_item_names in pairs(self.localized_reagent_to_profession_id_to_en_items[possible_reagent] or {}) do
-        local localized_profession_name = reagent_data['professions'][profession_id] or reagent_data['gathering'][profession_id]
-        local is_profession_supported = self.localized_crafting_profession_name_set[localized_profession_name] ~= nil
-        local is_profession_enabled_in_tooltips = self.db_options.ShowSkillsByTradeSkill[localized_profession_name]
-        if is_profession_supported and is_profession_enabled_in_tooltips then
-            ---@type TooltipItem[]
-            local group_items = {}
-            for _, en_item_name in ipairs(en_item_names) do
-                local item = reagent_data['crafted'][profession_id][en_item_name]
-                local localized_item_name = LR[en_item_name]
-                local source, _ = AceCore.strsplit(":", item.source, 2)
-                local is_reagent = false
-                if localized_item_name ~= nil then
-                    is_reagent = getn(ReagentData_GetProfessions(localized_item_name) or {}) > 0
-                else
-                    self:Print(format(L.txt_missing_locale, en_item_name))
-                end
+    for localized_profession_name, crafts in pairs(localized_profession_to_crafts) do
+        ---@type TooltipItem[]
+        local group_items = {}
 
-                ---@type table<string, string>
-                local other_character_to_difficulty = {}
-                for _, character in ipairs(self.db:GetOtherCharactersFromCurrentRealm()) do
-                    other_character_to_difficulty[character.name] = character.profession_to_skill_to_difficulty[localized_profession_name][localized_item_name]
+        for _, craft in ipairs(crafts) do
+            ---@type table<string, boolean>
+            local localized_sources_set = {}
+            for _, spell_source in ipairs(craft.sources) do
+                localized_sources_set[source_enum_to_string[spell_source]] = true
+            end
+            for _, recipe in ipairs(craft.recipes) do
+                for _, recipe_source in ipairs(recipe.sources) do
+                    localized_sources_set[source_enum_to_string[recipe_source]] = true
                 end
-
-                ---@type TooltipItem
-                local tooltip_item = {
-                    localized_name = localized_item_name or en_item_name,
-                    localized_source = en_source_to_localized_source[--[[---@not nil]] source] or source,
-                    required_rank = item.skill,
-                    is_reagent = is_reagent,
-                    difficulty = player_db.profession_to_skill_to_difficulty[localized_profession_name][localized_item_name],
-                    other_character_to_difficulty = other_character_to_difficulty,
-                }
-                tinsert(group_items, tooltip_item)
+            end
+            local localized_sources = {}
+            for localized_source, _ in pairs(localized_sources_set) do
+                tinsert(localized_sources, localized_source)
             end
 
-            tinsert(item_groups, {
-                localized_profession_name = localized_profession_name,
-                my_profession_rank = (my_profession_localized_name_to_rank[localized_profession_name] or {}).rank,
-                items = group_items
-            })
+            ---@type table<string, string>
+            local other_character_to_difficulty = {}
+            for _, character in ipairs(self.db:GetOtherCharactersFromCurrentRealm()) do
+                other_character_to_difficulty[character.name] = character.profession_to_skill_to_difficulty[localized_profession_name][craft.localized_spell_name]
+            end
+
+            local is_reagent = false
+            if craft.result ~= nil then
+                local result_item_id = (--[[---@not nil]] craft.result).id
+                is_reagent = next(LibCrafts:GetCraftsByReagentId(result_item_id)) ~= nil
+            end
+
+            ---@type TooltipItem
+            local tooltip_item = {
+                localized_name = craft.localized_spell_name,
+                localized_sources = localized_sources,
+                required_rank = craft.skill_level,
+                is_reagent = is_reagent,
+                difficulty = player_db.profession_to_skill_to_difficulty[localized_profession_name][craft.localized_spell_name],
+                other_character_to_difficulty = other_character_to_difficulty,
+            }
+            tinsert(group_items, tooltip_item)
         end
+
+        tinsert(item_groups, {
+            localized_profession_name = localized_profession_name,
+            my_profession_rank = (my_profession_localized_name_to_rank[localized_profession_name] or {}).rank,
+            items = group_items
+        })
     end
 
     return item_groups
@@ -423,13 +342,20 @@ function MasterTradeSkills:DrawTooltipItemGroups(tooltip_frame, groups)
                 skill_color,
                 item.localized_name)
 
+            local source_text = ""
+            local sources_num = getn(item.localized_sources)
+            table.sort(item.localized_sources)
+            for i, source in ipairs(item.localized_sources) do
+                source_text = source_text .. source .. (i < sources_num and ", " or "")
+            end
+
             local item_text_right = ""
             if other_characters_text ~= "" then
                 item_text_right = other_characters_text
             else
                 item_text_right = format("%s%s|r %s(%d)|r",
                     source_color,
-                    item.localized_source,
+                    source_text,
                     skill_color,
                     item.required_rank)
             end

@@ -24,7 +24,6 @@ MasterTradeSkills_Database = {}
 ---@shape MasterTradeSkillsDBOptions
 ---@field EnhanceTooltips boolean
 ---@field EnhanceTooltipsOnlyWhileShiftIsPressed boolean
----@field EnhanceMinimapNodesTooltips boolean
 ---@field ShowSkillsByTradeSkill table<string, boolean>
 ---@field ShowSkillsByDifficulty MasterTradeSkillsDBDifficultyOptions
 ---@field ShowSkillsByStatus MasterTradeSkillsDBStatusOptions
@@ -89,7 +88,6 @@ function MasterTradeSkills_Database:_GetDefaultOptions()
     return {
         EnhanceTooltips = true,
         EnhanceTooltipsOnlyWhileShiftIsPressed = false,
-        EnhanceMinimapNodesTooltips = false,
         ShowSkillsByTradeSkill = show_skills_by_trade_skill,
         ShowSkillsByDifficulty = {
             Trivial = true,

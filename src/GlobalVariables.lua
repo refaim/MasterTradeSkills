@@ -1,4 +1,4 @@
 setfenv(1, MasterTradeSkills)
 
 MtsAddonName = "MasterTradeSkills";
-MtsAddonVersion = "2.0"
+MtsAddonVersion = "2.1"

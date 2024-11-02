@@ -1,3 +1,10 @@
+### v2.1 (2024/11/02)
+
+- Get rid of ReagentData dependency and migrate to LibCrafts to make the database maintenance significantly easier
+- Remove embedded skill localization tables and use LibCrafts for that too
+- Migrate from tooltip text parsing to item id extracting to improve performance and reliability
+- Drop minimap nodes tooltip enhancing feature (unfortunately)
+
 ### v2.0 (2024/10/15)
 
 - Rewrite and refactor addon using Ace3v framework
