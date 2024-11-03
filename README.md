@@ -1,19 +1,23 @@
-### Description
-This addon is an information tool for all you trade skill loving fools! It will alter the tooltips of ingredients and tells you the following things:
+A World of Warcraft: Vanilla and [Turtle WoW](https://turtle-wow.org) addon that enhances the tooltip of trade skill ingredients.
 
-- It shows current trade skill level
-- It shows recipes where the selected ingredient is used in
-- It shows 'where' you can get the recipe (vendor, quest, etc.)
-- It shows what tradeskill level is required to use the recipe
-- It will show the skill color of the recipe. Or shows it in red if you don't know it yet
-- It will save everything between sessions per character
-
-Adjustable options. Show what skills you want to see. Show only learned or not learned recipes.
+### Features
+- Show recipes where the selected ingredient is used in
+- Show 'where' you can get the recipe (vendor, quest, etc.)
+- Show what tradeskill level is required to use the recipe
+- Show current trade skill level
+- Show the skill color of the recipe
+- Show names of alts who know the recipe
+- Show if the recipe is ingredient of another recipe (refer to +/- in front of the recipe)
+- Adjustable options (use `/mts options` command)
+- Support all your characters on the same realm
+- Support custom Turtle WoW recipes
 
 ### Usage
-To use Master Trade Skills, just install it. To let the addon know what recipes you know you have to open all your tradeskill windows first (tailoring, first aid, etc.). Next time you hover over an ingredient you will see the recipes in the tooltip.
+- Install the addon
+- Hover over an ingredient in the inventory, bank, vendor inventory, etc.
+- See the recipes in the tooltip
 
-You can open addon settings with `/mts options` slash command.
+If you open the tradeskill window after installing the addon, it will scan all your recipes and remember them.
 
 ### Screenshots
 ![image](screenshot1.png)
