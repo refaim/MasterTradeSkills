@@ -17,8 +17,16 @@ local LibCrafts = LibStub("LibCrafts-1.0")
 
 -- Query crafts using reagent ID
 local reagentId = 2318 -- Light Leather, see https://www.wowhead.com/classic/item=2318/light-leather
-local crafts = LibCraftingProfessions:GetCraftsByReagentId(reagentId) -- Light Leather
+local crafts = LibCrafts:GetCraftsByReagentId(reagentId) -- Light Leather
+
+--- Query crafts using english or localized profession name
+local crafts = LibCrafts:GetCraftsByProfession("Leatherworking")
+local crafts = LibCrafts:GetCraftsByProfession("制皮")
 ```
+
+## Changes
+
+See [CHANGES](CHANGES.md) for the full list of changes.
 
 ## Contributing
 

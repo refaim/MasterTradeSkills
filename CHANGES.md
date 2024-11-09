@@ -1,3 +1,7 @@
+### v2.3 (2024/11/09)
+- Update LibCrafts
+- Fix some minor code issues
+
 ### v2.2 (2024/11/03)
 - Support new Turtle WoW recipes for Vanilla professions
 

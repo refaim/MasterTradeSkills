@@ -6,11 +6,12 @@ assert(LibStub ~= nil, "Cannot find instance of a LibStub")
 
 local AceAddon, _ = LibStub("AceAddon-3.0")
 
----@type AceAddonDef
+---@class MasterTradeSkills: AceAddonDef
 ---@field db MasterTradeSkills_Database
----@field options MasterTradeSkillsDBOptions
----@field english_crafting_profession_name_to_localized table<string, string>
-local MasterTradeSkills = AceAddon:NewAddon(MtsAddonName, "AceConfig-3.0", "AceHook-3.0")
+---@field db_options MasterTradeSkillsDBOptions
+---@field supported_profession_localized_names_set table<string, boolean>
+
+local MasterTradeSkills = --[[---@type MasterTradeSkills]] AceAddon:NewAddon(MtsAddonName, "AceConfig-3.0")
 
 local AceDB, _ = LibStub("AceDB-3.0")
 
@@ -24,11 +25,6 @@ local LibItemTooltip = --[[---@type LibItemTooltip]] LibStub("LibItemTooltip-1.0
 ---@return LibAceConfigEmbedDef
 function MasterTradeSkills:AceConfig()
     return --[[---@type LibAceConfigEmbedDef]] self
-end
-
----@return LibAceHookEmbedDef
-function MasterTradeSkills:AceHook()
-    return --[[---@type LibAceHookEmbedDef]] self
 end
 
 ---@return void
@@ -48,12 +44,12 @@ end
 
 ---@return void
 function MasterTradeSkills:OnEnable()
-    ---@type table<string, string>
-    local english_crafting_profession_name_to_localized = {}
+    ---@type table<string, boolean>
+    local supported_profession_localized_names_set = {}
     for _, profession in ipairs(LibCraftingProfessions:GetSupportedProfessions()) do
-        english_crafting_profession_name_to_localized[profession.english_name] = profession.localized_name
+        supported_profession_localized_names_set[profession.localized_name] = true
     end
-    self.english_crafting_profession_name_to_localized = english_crafting_profession_name_to_localized
+    self.supported_profession_localized_names_set = supported_profession_localized_names_set
 
     self:Print(L.txt_addon_loaded);
 end
@@ -127,13 +123,13 @@ function MasterTradeSkills:CreateTooltipItemGroups(reagent_id)
     ---@type table<string, LcCraft[]>
     local localized_profession_to_crafts = {}
     for _, craft in ipairs(LibCrafts:GetCraftsByReagentId(reagent_id)) do
-        local localized_profession_name = self.english_crafting_profession_name_to_localized[craft.en_profession_name]
-        local is_profession_enabled_in_tooltips = self.db_options.ShowSkillsByTradeSkill[localized_profession_name]
-        if is_profession_enabled_in_tooltips then
-            local crafts = localized_profession_to_crafts[localized_profession_name]
+        local is_profession_supported = self.supported_profession_localized_names_set[craft.localized_profession_name] ~= nil
+        local is_profession_enabled_in_tooltips = self.db_options.ShowSkillsByTradeSkill[craft.localized_profession_name]
+        if is_profession_supported and is_profession_enabled_in_tooltips then
+            local crafts = localized_profession_to_crafts[craft.localized_profession_name]
             if crafts == nil then
                 crafts = {}
-                localized_profession_to_crafts[localized_profession_name] = crafts
+                localized_profession_to_crafts[craft.localized_profession_name] = crafts
             end
             tinsert(crafts, craft)
         end

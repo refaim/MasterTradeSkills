@@ -1,3 +1,9 @@
+### Revision 4 (2024/11/09)
+- Add locale modules for profession names
+- Add GetCraftsByProfession() API
+- Fix First Aid profession name
+- Fix library in-memory upgrade process
+
 ### Revision 3 (2024/11/03)
 - Add new Turtle WoW recipes for Vanilla professions
 - Fix craft indentation

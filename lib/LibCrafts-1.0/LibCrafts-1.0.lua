@@ -4,24 +4,56 @@
     Website: https://github.com/refaim/LibCrafts-1.0
     Description: A library designed to provide a database crafting spells, recipes, reagents etc.
     Dependencies: LibStub
-    Compatibility: World of Warcraft Vanilla (1.12.1)
+    Compatibility: Vanilla (1.12.1), Turtle (1.17.2)
 ]]
 
 ---@type LibStubDef
 local LibStub = getglobal("LibStub")
 assert(LibStub ~= nil)
 
-local untyped_lib, _ = LibStub:NewLibrary("LibCrafts-1.0", 3)
+local untyped_lib, _ = LibStub:NewLibrary("LibCrafts-1.0", 4)
 if not untyped_lib then return end
 
+---@class LibCrafts
+---@field env LcEnvironment
+---@field constants LcConstants
+---@field modules_by_name table<string, LcModule>
+---@field spell_id_to_craft table<number, LcCraft>
+---@field reagent_id_to_spell_ids_set table<number, table<number, boolean>>
+---@field localized_profession_name_to_spell_ids_set table<string, table<number, boolean>>
+
 local lib = --[[---@type LibCrafts]] untyped_lib
-if lib.modules_by_name == nil then
+lib.modules_by_name = lib.modules_by_name or {}
+lib.spell_id_to_craft = lib.spell_id_to_craft or {}
+lib.reagent_id_to_spell_ids_set = lib.reagent_id_to_spell_ids_set or {}
+lib.localized_profession_name_to_spell_ids_set = lib.localized_profession_name_to_spell_ids_set or {}
+
+---@type table[]
+local data_tables = {
+    lib.modules_by_name,
+    lib.spell_id_to_craft,
+    lib.reagent_id_to_spell_ids_set,
+    lib.localized_profession_name_to_spell_ids_set,
+}
+
+local all_data_tables_filled = true
+for _, data_table in ipairs(data_tables) do
+    if type(data_table) ~= "table" or next(data_table) == nil then
+        all_data_tables_filled = false
+        break
+    end
+end
+
+if not all_data_tables_filled then
     lib.modules_by_name = {}
+    lib.spell_id_to_craft = {}
+    lib.reagent_id_to_spell_ids_set = {}
+    lib.localized_profession_name_to_spell_ids_set = {}
 end
 
 lib.env = {
     is_debug = false,
-    is_turtle_wow = TargetHPText ~= nil and TargetHPPercText ~= nil,
+    is_turtle_wow = getglobal("LFT") ~= nil,
 }
 
 lib.constants = {
@@ -50,11 +82,6 @@ lib.constants = {
         Vendor = 308,
     },
 }
-
----@class LibCrafts
----@field env LcEnvironment
----@field constants LcConstants
----@field modules_by_name table<string, LcModule>
 
 ---@shape LcEnvironment
 ---@field is_debug boolean
@@ -104,6 +131,7 @@ lib.constants = {
 
 ---@class LcCraft
 ---@field en_profession_name string
+---@field localized_profession_name string
 ---@field spell_id number
 ---@field localized_spell_name string
 ---@field skill_level number
@@ -113,10 +141,24 @@ lib.constants = {
 ---@field reagent_id_to_count table<number, number>
 local Craft = {}
 
----@type table<number, LcCraft>
-local spell_id_to_craft = {}
----@type table<number, number[]>
-local reagent_id_to_spell_ids = {}
+---@param value string
+---@param locale_module_name string
+---@return string
+local function translate_from_en_to_game_locale(value, locale_module_name)
+    ---@type table<string, string|boolean>
+    local L = {}
+    local locale_module = --[[---@type LcLocaleModule]] lib.modules_by_name[locale_module_name]
+    if locale_module ~= nil then
+        L = locale_module:GetStrings()
+    end
+
+    local localized_value = L[value]
+    if type(localized_value) ~= "string" or localized_value == "" then
+        localized_value = value
+    end
+
+    return --[[---@type string]] localized_value
+end
 
 ---
 --- Returns a list of crafts by reagent item id.
@@ -125,8 +167,23 @@ local reagent_id_to_spell_ids = {}
 ---@return LcCraft[]
 function lib:GetCraftsByReagentId(item_id)
     local crafts = {}
-    for _, spell_id in ipairs(reagent_id_to_spell_ids[item_id] or {}) do
-        tinsert(crafts, spell_id_to_craft[spell_id])
+    for spell_id, _ in pairs(self.reagent_id_to_spell_ids_set[item_id] or {}) do
+        tinsert(crafts, self.spell_id_to_craft[spell_id])
+    end
+    return crafts
+end
+
+---
+--- Returns a list of crafts by profession name in current game locale (or in English).
+---
+---@param profession string
+---@return LcCraft[]
+function lib:GetCraftsByProfession(profession)
+    local d = self.localized_profession_name_to_spell_ids_set
+    local spell_ids_set = d[profession] or d[translate_from_en_to_game_locale(profession, "Locales-Professions")] or {}
+    local crafts = {}
+    for spell_id, _ in pairs(spell_ids_set) do
+        tinsert(crafts, self.spell_id_to_craft[spell_id])
     end
     return crafts
 end
@@ -137,6 +194,7 @@ end
 
 ---@class LcProfessionModule: LcModule
 ---@field en_profession_name string
+---@field localized_profession_name string
 local ProfessionModule = {}
 
 ---@class LcLocaleModule: LcModule
@@ -161,23 +219,28 @@ end
 
 ---@param name string
 ---@param version number
----@param profession string
+---@param en_profession_name string
 ---@return LcProfessionModule|nil
-function lib:RegisterProfessionModule(name, version, profession)
+function lib:RegisterProfessionModule(name, version, en_profession_name)
     if self.env.is_debug then
         assert(type(name) == "string" and name ~= "")
         assert(type(version) == "number" and version > 0)
-        assert(type(profession) == "string" and profession ~= "")
+        assert(type(en_profession_name) == "string" and en_profession_name ~= "")
     end
 
     if module_registered(name, version) then
         return nil
     end
 
-    local object = {name = name, version = version, en_profession_name = profession}
+    local object = {}
     setmetatable(object, {__index = ProfessionModule})
 
     local module = --[[---@type LcProfessionModule]] object
+    module.name = name
+    module.version = version
+    module.en_profession_name = en_profession_name
+    module.localized_profession_name = translate_from_en_to_game_locale(en_profession_name, "Locales-Professions")
+
     self.modules_by_name[name] = module
     return module
 end
@@ -201,10 +264,14 @@ function lib:RegisterLocaleModule(name, locale, version)
         return nil
     end
 
-    local object = {name = name, version = version, en_to_any = {}}
+    local object = {}
     setmetatable(object, {__index = LocaleModule})
 
     local module = --[[---@type LcLocaleModule]] object
+    module.name = name
+    module.version = version
+    module.en_to_any = {}
+
     self.modules_by_name[name] = module
     return module
 end
@@ -231,29 +298,20 @@ function ProfessionModule:NewCraft(spell_id, spell_name, skill_level, sources)
         end
     end
 
-    local locale_module = --[[---@type LcLocaleModule]] lib.modules_by_name["Locales-Spells"]
-    ---@type table<string, string|boolean>
-    local L = {}
-    if locale_module ~= nil then
-        L = locale_module:GetStrings()
-    end
-
-    local localized_spell_name = L[spell_name]
-    if type(localized_spell_name) ~= "string" or localized_spell_name == "" then
-        localized_spell_name = spell_name
-    end
-
-    local object = {
-        en_profession_name = self.en_profession_name,
-        spell_id = spell_id,
-        localized_spell_name = localized_spell_name,
-        skill_level = skill_level,
-        sources = sources,
-        recipes = {},
-        reagent_id_to_count = {},
-    }
+    local object = {}
     setmetatable(object, {__index = Craft})
-    return --[[---@type LcCraft]] object
+
+    local craft = --[[---@type LcCraft]] object
+    craft.en_profession_name = self.en_profession_name
+    craft.localized_profession_name = self.localized_profession_name
+    craft.spell_id = spell_id
+    craft.localized_spell_name = translate_from_en_to_game_locale(spell_name, "Locales-Spells")
+    craft.skill_level = skill_level
+    craft.sources = sources
+    craft.recipes = {}
+    craft.reagent_id_to_count = {}
+
+    return craft
 end
 
 ---@type table<number, boolean>
@@ -318,23 +376,39 @@ function Craft:AddReagent(id, count)
     return self
 end
 
+---@generic K
+---@param t table<K, table<number, boolean>>
+---@param key K
+---@return table<number, boolean>
+local function get_or_create_set(t, key)
+    local set = t[key]
+    if set == nil then
+        set = {}
+        t[key] = set
+    end
+    return set
+end
+
 function Craft:Save()
     if lib.env.is_debug then
         assert(next(self.sources) ~= nil or next(self.recipes) ~= nil)
         assert(next(self.reagent_id_to_count) ~= nil)
-        assert(spell_id_to_craft[self.spell_id] == nil)
     end
 
-    spell_id_to_craft[self.spell_id] = self
+    local old_craft = lib.spell_id_to_craft[self.spell_id]
+    if old_craft ~= nil then
+        for reagent_id, _ in pairs(old_craft.reagent_id_to_count) do
+            lib.reagent_id_to_spell_ids_set[reagent_id][self.spell_id] = nil
+        end
+        lib.localized_profession_name_to_spell_ids_set[old_craft.localized_profession_name][self.spell_id] = nil
+    end
+
+    lib.spell_id_to_craft[self.spell_id] = self
 
     for reagent_id, _ in pairs(self.reagent_id_to_count) do
-        local spell_ids = reagent_id_to_spell_ids[reagent_id]
-        if spell_ids == nil then
-            reagent_id_to_spell_ids[reagent_id] = {}
-            spell_ids = reagent_id_to_spell_ids[reagent_id]
-        end
-        tinsert(spell_ids, self.spell_id)
+        get_or_create_set(lib.reagent_id_to_spell_ids_set, reagent_id)[self.spell_id] = true
     end
+    get_or_create_set(lib.localized_profession_name_to_spell_ids_set, self.localized_profession_name)[self.spell_id] = true
 end
 
 ---@return LibCrafts

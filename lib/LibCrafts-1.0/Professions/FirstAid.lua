@@ -1,6 +1,6 @@
 local lib = LibCraftsGetLibrary()
-local name, version = "Professions-FirstAid", 2
-local module = --[[---@type LcProfessionModule]] lib:RegisterProfessionModule(name, version, "FirstAid")
+local name, version = "Professions-FirstAid", 3
+local module = --[[---@type LcProfessionModule]] lib:RegisterProfessionModule(name, version, "First Aid")
 if not module then return end
 
 local Quality = lib.constants.qualities
