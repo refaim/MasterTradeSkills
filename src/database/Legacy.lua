@@ -42,6 +42,7 @@ local INDEX_TO_TRADE_SKILL = {
     [8] = "First Aid",
     [9] = "Mining",
     [10] = "Poisons",
+    [11] = "Jewelcrafting",
 }
 
 ---@param defaults MasterTradeSkillsDBOptions

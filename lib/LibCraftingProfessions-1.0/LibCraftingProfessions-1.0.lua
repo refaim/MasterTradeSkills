@@ -37,6 +37,7 @@ local ALL_EXISTING_CRAFTING_PROFESSIONS_SET = {
     ["Mining"] = true,
     ["Poisons"] = true,
     ["Tailoring"] = true,
+    ["Jewelcrafting"] = true
 }
 
 ---@type table<string, string>
@@ -399,6 +400,7 @@ if game_locale == "enUS" or game_locale == "enGB" then
     L["Mining"] = "Mining"
     L["Poisons"] = "Poisons"
     L["Tailoring"] = "Tailoring"
+    L["Jewelcrafting"] = "Jewelcrafting"
 elseif game_locale == "deDE" then
     L["Alchemy"] = "Alchimie"
     L["Beast Training"] = "Wildtierausbildung"
@@ -411,6 +413,7 @@ elseif game_locale == "deDE" then
     L["Mining"] = "Bergbau"
     L["Poisons"] = "Gifte"
     L["Tailoring"] = "Schneiderei"
+    L["Jewelcrafting"] = "Jewelcrafting"
 elseif game_locale == "esES" then
     L["Alchemy"] = "Alquimia"
     L["Beast Training"] = "Doma de bestias"
@@ -423,6 +426,7 @@ elseif game_locale == "esES" then
     L["Mining"] = "Minería"
     L["Poisons"] = "Venenos"
     L["Tailoring"] = "Costura"
+    L["Jewelcrafting"] = "Jewelcrafting"
 elseif game_locale == "frFR" then
     L["Alchemy"] = "Alchimie"
     L["Beast Training"] = "Apprivoisement"
@@ -435,6 +439,7 @@ elseif game_locale == "frFR" then
     L["Mining"] = "Minage"
     L["Poisons"] = "Poisons"
     L["Tailoring"] = "Couture"
+    L["Jewelcrafting"] = "Jewelcrafting"
 elseif game_locale == "koKR" then
     L["Alchemy"] = "연금술"
     L["Beast Training"] = "야수 조련"
@@ -447,6 +452,7 @@ elseif game_locale == "koKR" then
     L["Mining"] = "채광"
     L["Poisons"] = "독"
     L["Tailoring"] = "재봉술"
+    L["Jewelcrafting"] = "Jewelcrafting"
 elseif game_locale == "ruRU" then
     L["Alchemy"] = "Алхимия"
     L["Beast Training"] = "Дрессировка"
@@ -459,6 +465,7 @@ elseif game_locale == "ruRU" then
     L["Mining"] = "Горное дело"
     L["Poisons"] = "Яды"
     L["Tailoring"] = "Портняжное дело"
+    L["Jewelcrafting"] = "Jewelcrafting"
 elseif game_locale == "zhCN" then
     L["Alchemy"] = "炼金术"
     L["Beast Training"] = "训练野兽"
@@ -471,6 +478,7 @@ elseif game_locale == "zhCN" then
     L["Mining"] = "采矿"
     L["Poisons"] = "毒药"
     L["Tailoring"] = "裁缝"
+    L["Jewelcrafting"] = "Jewelcrafting"
 elseif game_locale == "zhTW" then
     L["Alchemy"] = "煉金術"
     L["Beast Training"] = "訓練野獸"
@@ -483,6 +491,7 @@ elseif game_locale == "zhTW" then
     L["Mining"] = "採礦"
     L["Poisons"] = "毒藥"
     L["Tailoring"] = "裁縫"
+    L["Jewelcrafting"] = "Jewelcrafting"
 end
 
 for english_name, localized_name in pairs(ENGLISH_TO_LOCALIZED) do
