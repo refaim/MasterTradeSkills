@@ -11,7 +11,7 @@
 local LibStub = getglobal("LibStub")
 assert(LibStub ~= nil)
 
-local untyped_lib, _ = LibStub:NewLibrary("LibCraftingProfessions-1.0", 2)
+local untyped_lib, _ = LibStub:NewLibrary("LibCraftingProfessions-1.0", 5)
 if not untyped_lib then
     return
 end
@@ -24,6 +24,8 @@ local lib = --[[---@type LibCraftingProfessions]] untyped_lib
 if lib.event_to_handlers == nil then
     lib.event_to_handlers = {}
 end
+
+local IS_TURTLE_WOW = getglobal("LFT") ~= nil
 
 ---@type table<string, boolean>
 local ALL_EXISTING_CRAFTING_PROFESSIONS_SET = {
@@ -38,6 +40,9 @@ local ALL_EXISTING_CRAFTING_PROFESSIONS_SET = {
     ["Poisons"] = true,
     ["Tailoring"] = true,
 }
+if IS_TURTLE_WOW then
+    ALL_EXISTING_CRAFTING_PROFESSIONS_SET["Jewelcrafting"] = true
+end
 
 ---@type table<string, string>
 local ENGLISH_TO_LOCALIZED = {}
@@ -399,6 +404,9 @@ if game_locale == "enUS" or game_locale == "enGB" then
     L["Mining"] = "Mining"
     L["Poisons"] = "Poisons"
     L["Tailoring"] = "Tailoring"
+    if IS_TURTLE_WOW then
+        L["Jewelcrafting"] = "Jewelcrafting"
+    end
 elseif game_locale == "deDE" then
     L["Alchemy"] = "Alchimie"
     L["Beast Training"] = "Wildtierausbildung"
@@ -411,6 +419,9 @@ elseif game_locale == "deDE" then
     L["Mining"] = "Bergbau"
     L["Poisons"] = "Gifte"
     L["Tailoring"] = "Schneiderei"
+    if IS_TURTLE_WOW then
+        L["Jewelcrafting"] = "Juwelierskunst"
+    end
 elseif game_locale == "esES" then
     L["Alchemy"] = "Alquimia"
     L["Beast Training"] = "Doma de bestias"
@@ -423,6 +434,24 @@ elseif game_locale == "esES" then
     L["Mining"] = "Minería"
     L["Poisons"] = "Venenos"
     L["Tailoring"] = "Costura"
+    if IS_TURTLE_WOW then
+        L["Jewelcrafting"] = "Joyería"
+    end
+elseif game_locale == "esMX" then
+    L["Alchemy"] = "Alquimia"
+    L["Beast Training"] = "Entrenamiento de bestias"
+    L["Blacksmithing"] = "Herrería"
+    L["Cooking"] = "Cocina"
+    L["Enchanting"] = "Encantamiento"
+    L["Engineering"] = "Ingeniería"
+    L["First Aid"] = "Primeros auxilios"
+    L["Leatherworking"] = "Peletería"
+    L["Mining"] = "Minería"
+    L["Poisons"] = "Venenos"
+    L["Tailoring"] = "Sastrería"
+    if IS_TURTLE_WOW then
+        L["Jewelcrafting"] = "Joyería"
+    end
 elseif game_locale == "frFR" then
     L["Alchemy"] = "Alchimie"
     L["Beast Training"] = "Apprivoisement"
@@ -435,6 +464,9 @@ elseif game_locale == "frFR" then
     L["Mining"] = "Minage"
     L["Poisons"] = "Poisons"
     L["Tailoring"] = "Couture"
+    if IS_TURTLE_WOW then
+        L["Jewelcrafting"] = "Joaillerie"
+    end
 elseif game_locale == "koKR" then
     L["Alchemy"] = "연금술"
     L["Beast Training"] = "야수 조련"
@@ -447,6 +479,24 @@ elseif game_locale == "koKR" then
     L["Mining"] = "채광"
     L["Poisons"] = "독"
     L["Tailoring"] = "재봉술"
+    if IS_TURTLE_WOW then
+        L["Jewelcrafting"] = "보석세공"
+    end
+elseif game_locale == "ptBR" or (IS_TURTLE_WOW and game_locale == "xxYY") then
+    L["Alchemy"] = "Alquimia"
+    L["Beast Training"] = "Treinamento de Feras"
+    L["Blacksmithing"] = "Ferraria"
+    L["Cooking"] = "Culinária"
+    L["Enchanting"] = "Encantamento"
+    L["Engineering"] = "Engenharia"
+    L["First Aid"] = "Primeiros Socorros"
+    L["Leatherworking"] = "Couraria"
+    L["Mining"] = "Mineração"
+    L["Poisons"] = "Venenos"
+    L["Tailoring"] = "Alfaiataria"
+    if IS_TURTLE_WOW then
+        L["Jewelcrafting"] = "Joalheria"
+    end
 elseif game_locale == "ruRU" then
     L["Alchemy"] = "Алхимия"
     L["Beast Training"] = "Дрессировка"
@@ -459,6 +509,9 @@ elseif game_locale == "ruRU" then
     L["Mining"] = "Горное дело"
     L["Poisons"] = "Яды"
     L["Tailoring"] = "Портняжное дело"
+    if IS_TURTLE_WOW then
+        L["Jewelcrafting"] = "Ювелирное дело"
+    end
 elseif game_locale == "zhCN" then
     L["Alchemy"] = "炼金术"
     L["Beast Training"] = "训练野兽"
@@ -471,6 +524,9 @@ elseif game_locale == "zhCN" then
     L["Mining"] = "采矿"
     L["Poisons"] = "毒药"
     L["Tailoring"] = "裁缝"
+    if IS_TURTLE_WOW then
+        L["Jewelcrafting"] = "珠宝加工"
+    end
 elseif game_locale == "zhTW" then
     L["Alchemy"] = "煉金術"
     L["Beast Training"] = "訓練野獸"
@@ -483,6 +539,9 @@ elseif game_locale == "zhTW" then
     L["Mining"] = "採礦"
     L["Poisons"] = "毒藥"
     L["Tailoring"] = "裁縫"
+    if IS_TURTLE_WOW then
+        L["Jewelcrafting"] = "珠寶設計"
+    end
 end
 
 for english_name, localized_name in pairs(ENGLISH_TO_LOCALIZED) do

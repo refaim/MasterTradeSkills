@@ -32,6 +32,9 @@ LibCraftingProfessions:RegisterEvent("LCP_SKILLS_UPDATE", function(profession, s
     end
 end)
 ```
+## Changes
+
+See [CHANGES](CHANGES.md) for the full list of changes.
 
 ## Contributing
 

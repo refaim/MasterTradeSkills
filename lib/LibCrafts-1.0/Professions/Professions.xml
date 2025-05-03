@@ -9,4 +9,5 @@
     <Script file="Mining.lua" />
     <Script file="Poisons.lua" />
     <Script file="Tailoring.lua" />
+    <Include file="Turtle\Professions.xml"/>
 </Ui>

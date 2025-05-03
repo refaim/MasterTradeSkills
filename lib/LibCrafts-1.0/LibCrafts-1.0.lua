@@ -11,7 +11,7 @@
 local LibStub = getglobal("LibStub")
 assert(LibStub ~= nil)
 
-local untyped_lib, _ = LibStub:NewLibrary("LibCrafts-1.0", 4)
+local untyped_lib, _ = LibStub:NewLibrary("LibCrafts-1.0", 5)
 if not untyped_lib then return end
 
 ---@class LibCrafts

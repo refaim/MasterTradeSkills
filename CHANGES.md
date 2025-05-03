@@ -1,3 +1,7 @@
+### v2.4 (2025/05/03)
+- Support Turtle WoW Jewelcrafting profession (thanks to [KasVital](https://github.com/KasVital))
+- Support esMX and ptBR database locales
+
 ### v2.3 (2024/11/09)
 - Update LibCrafts
 - Fix some minor code issues

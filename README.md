@@ -31,6 +31,7 @@ If you open the tradeskill window after installing the addon, it will scan all y
 - German Localization: Farook
 - French Localization: Tigaa
 - Russian Localization: [KasVital](https://github.com/KasVital), [Refaim](https://github.com/refaim)
+- Turtle WoW Jewelcrafting support: [KasVital](https://github.com/KasVital)
 
 ### Development Requirements
 - [Vanilla-WoW-Lua-Definitions](https://github.com/refaim/Vanilla-WoW-Lua-Definitions)

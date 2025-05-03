@@ -1,3 +1,6 @@
+### Revision 5 (2025/05/03)
+- Support Turtle WoW Jewelcrafting profession (by [KasVital](https://github.com/KasVital))
+
 ### Revision 4 (2024/11/09)
 - Add locale modules for profession names
 - Add GetCraftsByProfession() API
