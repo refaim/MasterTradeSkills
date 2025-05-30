@@ -9,6 +9,7 @@ LibCraftingProfessions is a small library designed to provide a universal interf
 - Get a list of known skills for each profession
 - Clean data from non-obvious peculiarities of the game interface
 - Cache data for using by multiple addons
+- Supports all modern major 1.12 profession frame replacement addons ([AdvancedTradeSkillWindow](https://github.com/laytya/AdvancedTradeSkillWindow-vanilla), [AdvancedTradeSkillWindow2](https://github.com/Shellyoung/AdvancedTradeSkillWindow2), [Artisan](https://github.com/Otari98/Artisan))
 
 ## Usage examples
 
@@ -22,7 +23,7 @@ local professions = LibCraftingProfessions:GetSupportedProfessions()
 local player_professions = LibCraftingProfessions:GetPlayerProfessions()
 
 -- Get player skills for a specific profession
-local skills = LibCraftingProfessions:GetPlayerProfessionSkills("Blacksmithing")
+local bs_skills = LibCraftingProfessions:GetPlayerProfessionSkills("Blacksmithing")
 
 --- Listen for the profession skills update event
 LibCraftingProfessions:RegisterEvent("LCP_SKILLS_UPDATE", function(profession, skills)
@@ -30,6 +31,10 @@ LibCraftingProfessions:RegisterEvent("LCP_SKILLS_UPDATE", function(profession, s
     for _, skill in ipairs(skills) do
         print(skill.localized_name)
     end
+end)
+
+LibCraftingProfessions:RegisterEvent("LCP_FRAME_SHOW", function(profession, frame, frame_type)
+    print(profession.localized_name)
 end)
 ```
 ## Changes

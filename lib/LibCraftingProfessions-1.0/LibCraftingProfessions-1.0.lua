@@ -11,7 +11,7 @@
 local LibStub = getglobal("LibStub")
 assert(LibStub ~= nil)
 
-local untyped_lib, _ = LibStub:NewLibrary("LibCraftingProfessions-1.0", 5)
+local untyped_lib, _ = LibStub:NewLibrary("LibCraftingProfessions-1.0", 10)
 if not untyped_lib then
     return
 end
@@ -54,7 +54,26 @@ local LOCALIZED_TO_ENGLISH = {}
 ---@field localized_name string
 
 ---@shape LcpKnownProfession: LcpProfession
----@field cur_rank number|nil
+---@field cur_rank number
+
+---@alias LcpProfessionFrameType "VanillaCraftFrame" | "VanillaTradeSkillFrame" | "TurtleTradeSkillFrame" | "Artisan" | "AdvancedTradeSkillWindow" | "AdvancedTradeSkillWindow2"
+
+---@type {FrameType: table<LcpProfessionFrameType, LcpProfessionFrameType>}
+LibCraftingProfessionsConstants = {
+    FrameType = {
+        VanillaCraftFrame = "VanillaCraftFrame",
+        VanillaTradeSkillFrame = "VanillaTradeSkillFrame",
+        TurtleTradeSkillFrame = "TurtleTradeSkillFrame",
+        Artisan = "Artisan",
+        AdvancedTradeSkillWindow = "AdvancedTradeSkillWindow",
+        AdvancedTradeSkillWindow2 = "AdvancedTradeSkillWindow2",
+    }
+}
+local FrameType = LibCraftingProfessionsConstants.FrameType
+
+---@shape LcpProfessionFrame
+---@field frame Frame
+---@field type LcpProfessionFrameType
 
 ---@alias LcpSkillDifficulty "trivial" | "easy" | "medium" | "optimal" | "difficult"
 
@@ -117,8 +136,7 @@ function lib:GetPlayerProfessions()
             local english_name = LOCALIZED_TO_ENGLISH[localized_name]
             local is_crafting_profession = ALL_EXISTING_CRAFTING_PROFESSIONS_SET[english_name] ~= nil
             if is_crafting_profession then
-                local has_rank = english_name ~= "Poisons"
-                if has_rank and not ready(rank) then
+                if not ready(rank) then
                     return nil
                 end
                 tinsert(professions, {english_name = english_name, localized_name = localized_name, cur_rank = rank})
@@ -142,9 +160,14 @@ end
 
 ---
 --- Registers a handler for the specific library event.
----
----@param event "LCP_SKILLS_UPDATE" @ The event to register for. This event is fired when skill data is updated and ready.
----@param handler fun(profession: LcpKnownProfession, skills: LcpKnownSkill[]):void @ The function to call when the event is triggered.
+--- LCP_SKILLS_UPDATE is fired when skill data is updated and ready for retrieval.
+--- LCP_FRAME_SHOW is fired when a crafting profession frame is shown.
+--- LCP_FRAME_CLOSE is fired when a crafting profession frame is closed.
+---@param event string
+---@param handler function
+---@overload fun(event: "LCP_SKILLS_UPDATE", handler: fun(profession: LcpKnownProfession, skills: LcpKnownSkill[]):void)
+---@overload fun(event: "LCP_FRAME_SHOW", handler: fun(profession: LcpKnownProfession, frame: Frame, frame_type: LcpProfessionFrameType):void)
+---@overload fun(event: "LCP_FRAME_CLOSE", handler: fun(frame: Frame, frame_type: LcpProfessionFrameType):void)
 function lib:RegisterEvent(event, handler)
     if lib.event_to_handlers[event] == nil then
         lib.event_to_handlers[event] = {}
@@ -251,6 +274,20 @@ local function forget_obsolete_professions(known_professions)
     end
 end
 
+---@param known_professions LcpKnownProfession[]|nil
+---@param name string
+---@return LcpKnownProfession|nil
+local function find_known_profession(known_professions, name)
+    local profession
+    for _, candidate in ipairs(known_professions or {}) do
+        if candidate.localized_name == name or candidate.english_name == name then
+            profession = candidate
+            break
+        end
+    end
+    return profession
+end
+
 ---@param english_name string
 ---@param skills LcpKnownSkill[]
 local function save_skills(english_name, skills)
@@ -259,19 +296,81 @@ local function save_skills(english_name, skills)
     local known_professions = lib:GetPlayerProfessions()
     forget_obsolete_professions(known_professions)
 
-    local profession
-    for _, candidate in ipairs(known_professions or {}) do
-        if candidate.english_name == english_name then
-            profession = candidate
-            break
-        end
-    end
+    local profession = find_known_profession(known_professions, english_name)
     if profession == nil then
         return
     end
 
     for _, handler in ipairs(lib.event_to_handlers["LCP_SKILLS_UPDATE"] or {}) do
         handler(profession, skills)
+    end
+end
+
+---@shape LcpThirdPartyProfessionFrameAddon
+---@field name string
+---@field frame_name string
+---@field opens_and_closes_vanilla_profession_frames boolean
+
+---@type LcpThirdPartyProfessionFrameAddon
+local artisan = {name = "Artisan", frame_name = "ArtisanFrame", opens_and_closes_vanilla_profession_frames = true}
+---@type LcpThirdPartyProfessionFrameAddon
+local atsw = {name = "AdvancedTradeSkillWindow", frame_name = "ATSWFrame", opens_and_closes_vanilla_profession_frames = false}
+---@type LcpThirdPartyProfessionFrameAddon
+local atsw2 = {name = "AdvancedTradeSkillWindow2", frame_name = "ATSWFrame", opens_and_closes_vanilla_profession_frames = true}
+
+local SUPPORTED_THIRD_PARTY_ADDONS = {artisan, atsw, atsw2}
+
+---@param addon LcpThirdPartyProfessionFrameAddon
+local function is_third_party_loaded(addon)
+    return IsAddOnLoaded(addon.name) == 1 and getglobal(addon.frame_name) ~= nil
+end
+
+---@return LcpProfessionFrame
+local function detect_profession_frame(professionFrame)
+    ---@type Frame
+    local atsw1_or_atsw2_frame = getglobal(atsw2.frame_name)
+    if atsw1_or_atsw2_frame ~= nil then
+        ---@type LcpProfessionFrameType
+        local frame_type = FrameType.AdvancedTradeSkillWindow
+        if is_third_party_loaded(atsw2) then
+            frame_type = FrameType.AdvancedTradeSkillWindow2
+        end
+        return {frame = atsw1_or_atsw2_frame, type = frame_type}
+    end
+
+    if is_third_party_loaded(artisan) then
+        return {frame = getglobal(artisan.frame_name), type = FrameType.Artisan}
+    end
+
+    if professionFrame == TradeSkillFrame then
+        local frame_type = IS_TURTLE_WOW and FrameType.TurtleTradeSkillFrame or FrameType.VanillaTradeSkillFrame
+        return {frame = professionFrame, type = frame_type}
+    end
+
+    return {frame = professionFrame, type = FrameType.VanillaCraftFrame}
+end
+
+---@param english_name string
+---@param localized_name string
+---@param cur_rank number
+---@param frame Frame
+local function send_frame_show_event(english_name, localized_name, cur_rank, frame)
+    local profession = {
+        english_name = english_name,
+        localized_name = localized_name,
+        cur_rank = cur_rank,
+    }
+    local real_frame = detect_profession_frame(frame)
+    for _, handler in ipairs(lib.event_to_handlers["LCP_FRAME_SHOW"] or {}) do
+        handler(profession, real_frame.frame, real_frame.type)
+    end
+end
+
+---@param frame Frame
+local function send_frame_close_event(frame)
+    local real_frame = detect_profession_frame(frame)
+    for _, handler in ipairs(lib.event_to_handlers["LCP_FRAME_CLOSE"] or {}) do
+        handler(real_frame.frame, real_frame.type)
     end
 end
 
@@ -296,8 +395,8 @@ local function scan_craft_frame()
         DisableFilters = function() end,
     }
 
-    local localized_name, _, _ = adapter.GetProfessionInfo()
-    if not ready(localized_name) then
+    local localized_name, cur_rank, _ = adapter.GetProfessionInfo()
+    if not ready(localized_name) or not ready(cur_rank) then
         return
     end
 
@@ -305,6 +404,8 @@ local function scan_craft_frame()
     if english_name == nil or english_name == "Beast Training" then
         return
     end
+
+    send_frame_show_event(english_name, --[[---@not nil]] localized_name, --[[---@not nil]] cur_rank, CraftFrame)
 
     local skills = scan_skills(adapter)
     if not ready(skills) then
@@ -372,8 +473,8 @@ local function scan_trade_skill_frame()
         end,
     }
 
-    local localized_name, _, _ = profession_adapter.GetProfessionInfo()
-    if not ready(localized_name) then
+    local localized_name, cur_rank, _ = profession_adapter.GetProfessionInfo()
+    if not ready(localized_name) or not ready(cur_rank) then
         return
     end
 
@@ -381,6 +482,8 @@ local function scan_trade_skill_frame()
     if english_name == nil then
         return
     end
+
+    send_frame_show_event(english_name, --[[---@not nil]] localized_name, --[[---@not nil]] cur_rank, TradeSkillFrame)
 
     local skills = scan_skills(profession_adapter)
     if not ready(skills) then
@@ -548,17 +651,72 @@ for english_name, localized_name in pairs(ENGLISH_TO_LOCALIZED) do
     LOCALIZED_TO_ENGLISH[localized_name] = english_name
 end
 
+---@param frame Frame
+---@return table
+local function as_table(frame)
+    return --[[---@type table]] frame
+end
+
+local was_third_party_on_hide_hooked = false
+
+---@param addon LcpThirdPartyProfessionFrameAddon
+local function hook_third_party_on_hide(addon)
+    if not is_third_party_loaded(addon) then
+        return
+    end
+
+    ---@type Frame
+    local frame = getglobal(addon.frame_name)
+    if frame == nil or as_table(frame).is_hooked_by_lcp == true then
+        return
+    end
+
+    local on_hide = frame:GetScript("OnHide")
+    frame:SetScript("OnHide", function()
+        if on_hide ~= nil then
+            (--[[---@not nil]] on_hide)()
+        end
+        send_frame_close_event(frame)
+    end)
+
+    as_table(frame).is_hooked_by_lcp = true
+    was_third_party_on_hide_hooked = true
+end
+
 if lib.event_frame ~= nil then
     lib.event_frame:UnregisterAllEvents()
     lib.event_frame:SetScript("OnEvent", nil)
 end
 lib.event_frame = CreateFrame("Frame")
 lib.event_frame:SetScript("OnEvent", function()
-    if event == "CRAFT_SHOW" then
+    if event == "ADDON_LOADED" then
+        for _, addon in ipairs(SUPPORTED_THIRD_PARTY_ADDONS) do
+            if addon.name == arg1 and addon.opens_and_closes_vanilla_profession_frames then
+                hook_third_party_on_hide(addon)
+            end
+        end
+    elseif event == "CRAFT_SHOW" then
         scan_craft_frame()
+    elseif event == "CRAFT_CLOSE" then
+        if not was_third_party_on_hide_hooked then
+            send_frame_close_event(CraftFrame)
+        end
     elseif event == "TRADE_SKILL_SHOW" then
         scan_trade_skill_frame()
+    elseif event == "TRADE_SKILL_CLOSE" then
+        if not was_third_party_on_hide_hooked then
+            send_frame_close_event(TradeSkillFrame)
+        end
     end
 end)
+lib.event_frame:RegisterEvent("ADDON_LOADED")
 lib.event_frame:RegisterEvent("CRAFT_SHOW")
+lib.event_frame:RegisterEvent("CRAFT_CLOSE")
 lib.event_frame:RegisterEvent("TRADE_SKILL_SHOW")
+lib.event_frame:RegisterEvent("TRADE_SKILL_CLOSE")
+
+for _, addon in ipairs(SUPPORTED_THIRD_PARTY_ADDONS) do
+    if is_third_party_loaded(addon) and addon.opens_and_closes_vanilla_profession_frames then
+        hook_third_party_on_hide(addon)
+    end
+end
