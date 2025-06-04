@@ -4,14 +4,14 @@
     Website: https://github.com/refaim/LibCraftingProfessions-1.0
     Description: A library designed to provide a universal interface for crafting professions.
     Dependencies: LibStub
-    Compatibility: World of Warcraft Vanilla (1.12.1)
+    Compatibility: World of Warcraft Vanilla (1.12.1), Turtle (1.17.2)
 ]]
 
 ---@type LibStubDef
 local LibStub = getglobal("LibStub")
 assert(LibStub ~= nil)
 
-local untyped_lib, _ = LibStub:NewLibrary("LibCraftingProfessions-1.0", 10)
+local untyped_lib, _ = LibStub:NewLibrary("LibCraftingProfessions-1.0", 11)
 if not untyped_lib then
     return
 end
@@ -27,22 +27,26 @@ end
 
 local IS_TURTLE_WOW = getglobal("LFT") ~= nil
 
----@type table<string, boolean>
-local ALL_EXISTING_CRAFTING_PROFESSIONS_SET = {
-    ["Alchemy"] = true,
-    ["Blacksmithing"] = true,
-    ["Cooking"] = true,
-    ["Enchanting"] = true,
-    ["Engineering"] = true,
-    ["First Aid"] = true,
-    ["Leatherworking"] = true,
-    ["Mining"] = true,
-    ["Poisons"] = true,
-    ["Tailoring"] = true,
-}
+---@shape LcpProfessionProps
+---@field icon string
+
+---@type table<string, LcpProfessionProps>
+local P = {}
+P["Alchemy"] = {icon = [[Interface\Icons\trade_alchemy]]}
+P["Blacksmithing"] = {icon = [[Interface\Icons\trade_blacksmithing]]}
+P["Cooking"] = {icon = [[Interface\Icons\inv_misc_food_15]]}
+P["Enchanting"] = {icon = [[Interface\Icons\trade_engraving]]}
+P["Engineering"] = {icon = [[Interface\Icons\trade_engineering]]}
+P["First Aid"] = {icon = [[Interface\Icons\spell_holy_sealofsacrifice]]}
+P["Leatherworking"] = {icon = [[Interface\Icons\inv_misc_armorkit_17]]}
+P["Mining"] = {icon = [[Interface\Icons\spell_fire_flameblades]]}
+P["Poisons"] = {icon = [[Interface\Icons\trade_brewpoison]]}
+P["Tailoring"] = {icon = [[Interface\Icons\trade_tailoring]]}
 if IS_TURTLE_WOW then
-    ALL_EXISTING_CRAFTING_PROFESSIONS_SET["Jewelcrafting"] = true
+    P["Jewelcrafting"] = {icon = [[Interface\Icons\inv_helmet_44]]}
 end
+local PROFESSION_TO_PROPS = P
+P = {}
 
 ---@type table<string, string>
 local ENGLISH_TO_LOCALIZED = {}
@@ -52,6 +56,7 @@ local LOCALIZED_TO_ENGLISH = {}
 ---@shape LcpProfession
 ---@field english_name string
 ---@field localized_name string
+---@field icon_texture_path string
 
 ---@shape LcpKnownProfession: LcpProfession
 ---@field cur_rank number
@@ -106,8 +111,12 @@ end
 function lib:GetSupportedProfessions()
     ---@type LcpProfession[]
     local professions = {}
-    for english_name, _ in pairs(ALL_EXISTING_CRAFTING_PROFESSIONS_SET) do
-        tinsert(professions, {english_name = english_name, localized_name = ENGLISH_TO_LOCALIZED[english_name]})
+    for english_name, props in pairs(PROFESSION_TO_PROPS) do
+        tinsert(professions, {
+            english_name = english_name,
+            localized_name = ENGLISH_TO_LOCALIZED[english_name],
+            icon_texture_path = props.icon,
+        })
     end
     return professions
 end
@@ -134,12 +143,17 @@ function lib:GetPlayerProfessions()
             end
 
             local english_name = LOCALIZED_TO_ENGLISH[localized_name]
-            local is_crafting_profession = ALL_EXISTING_CRAFTING_PROFESSIONS_SET[english_name] ~= nil
-            if is_crafting_profession then
+            local crafting_props = PROFESSION_TO_PROPS[english_name]
+            if crafting_props ~= nil then
                 if not ready(rank) then
                     return nil
                 end
-                tinsert(professions, {english_name = english_name, localized_name = localized_name, cur_rank = rank})
+                tinsert(professions, {
+                    english_name = english_name,
+                    localized_name = localized_name,
+                    icon_texture_path = crafting_props.icon,
+                    cur_rank = rank,
+                })
             end
         end
     end

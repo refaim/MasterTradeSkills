@@ -1,5 +1,5 @@
 local lib = LibCraftsGetLibrary()
-local name, locale, version = "Locales-Spells", "frFR", 3
+local name, locale, version = "Locales-Spells", "frFR", 4
 local module = --[[---@type LcLocaleModule]] lib:RegisterLocaleModule(name, locale, version)
 if not module then return end
 
@@ -1316,6 +1316,8 @@ if lib.env.is_turtle_wow then
     L["Copper Knuckles"] = false -- TODO translate
     L["Copper Staff"] = false -- TODO translate
     L["Corehound Gloves"] = false -- TODO translate
+    L["Corrosive Poison II"] = false -- TODO translate
+    L["Corrosive Poison"] = false -- TODO translate
     L["Crown of Elegance"] = false -- TODO translate
     L["Crown of Molten Ascension"] = false -- TODO translate
     L["Crown of the Illustrious Queen"] = false -- TODO translate
@@ -1377,6 +1379,7 @@ if lib.env.is_turtle_wow then
     L["Emberstone Studded Ring"] = false -- TODO translate
     L["Emerald Monarch's Glow"] = false -- TODO translate
     L["Empowered Domination Rod"] = false -- TODO translate
+    L["Empowering Herbal Salad"] = false -- TODO translate
     L["Enchant 2H Weapon - Minor Intellect"] = false -- TODO translate
     L["Enchant Boots - Greater Spirit"] = false -- TODO translate
     L["Enchant Boots - Superior Stamina"] = false -- TODO translate

@@ -1,3 +1,6 @@
+### v2.4.2 (2025/05/30)
+- Update LibCrafts, LibCraftingProfessions and LibItemTooltip
+
 ### v2.4.1 (2025/05/30)
 - Update LibCraftingProfessions
 

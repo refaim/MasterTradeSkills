@@ -19,6 +19,9 @@ A World of Warcraft: Vanilla and [Turtle WoW](https://turtle-wow.org) addon that
 
 If you open the tradeskill window after installing the addon, it will scan all your recipes and remember them.
 
+### Non-English Client Support
+Installing [SuperWoW](https://github.com/balakethelock/SuperWoW) may help resolve translation issues with trade skills when using non-English game clients.
+
 ### Screenshots
 ![image](screenshot1.png)
 ![image](screenshot2.png)

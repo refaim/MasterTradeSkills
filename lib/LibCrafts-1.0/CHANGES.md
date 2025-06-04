@@ -1,3 +1,10 @@
+### Revision 7 (2025/06/04)
+- Significantly improve localization support by using SuperWoW (if available)
+
+### Revision 6 (2025/06/01)
+- Add a couple of missing Turtle-specific recipes
+- Add GetCraftsByRecipeId to public API
+
 ### Revision 5 (2025/05/03)
 - Support Turtle WoW Jewelcrafting profession (by [KasVital](https://github.com/KasVital))
 

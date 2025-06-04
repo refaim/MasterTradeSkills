@@ -1,5 +1,5 @@
 local lib = LibCraftsGetLibrary()
-local name, version = "Professions-Poisons", 2
+local name, version = "Professions-Poisons", 3
 local module = --[[---@type LcProfessionModule]] lib:RegisterProfessionModule(name, version, "Poisons")
 if not module then return end
 
@@ -145,5 +145,20 @@ if lib.env.is_turtle_wow then
         :SetResult(65032)
         :AddReagent(2931, 2) -- Maiden's Anguish
         :AddReagent(3372, 1) -- Leaded Vial
+        :Save()
+
+    module:NewCraft(51924, "Corrosive Poison", 260, {SpellSource.Trainer})
+        :SetResult(47408)
+        :AddReagent(5173, 3) -- Deathweed
+        :AddReagent(8924, 3) -- Dust of Deterioration
+        :AddReagent(8925, 1) -- Crystal Vial
+        :Save()
+
+    module:NewCraft(52576, "Corrosive Poison II", 300, {})
+        :SetResult(47409)
+        :AddRecipe(21302, Quality.Rare, {RecipeSource.Drop})
+        :AddReagent(5173, 3) -- Deathweed
+        :AddReagent(8924, 3) -- Dust of Deterioration
+        :AddReagent(8925, 1) -- Crystal Vial
         :Save()
 end
