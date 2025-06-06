@@ -1,3 +1,6 @@
+### v2.4.3 (2025/06/06)
+- Update tooltip data when levelling up profession and learning new skills
+
 ### v2.4.2 (2025/05/30)
 - Update LibCrafts, LibCraftingProfessions and LibItemTooltip
 

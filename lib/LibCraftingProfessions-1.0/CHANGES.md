@@ -1,3 +1,6 @@
+### Revision 12 (2025/06/06)
+- Send profession skills update event when levelling up profession and learning new skill
+
 ### Revision 11 (2025/06/01)
 - Add profession icon textures
 
