@@ -1,9 +1,16 @@
 ## Interface: 11200
 ## Title: MasterTradeSkills
 ## Notes: This addon customizes the tooltip display to show which recipe uses the item your hovering above
+## Notes-deDE: Dieses Addon passt die Tooltip-Anzeige an, um zu zeigen, welches Rezept den Gegenstand verwendet, über den Sie schweben
+## Notes-esES: Este addon personaliza la visualización de descripción para mostrar qué receta usa el elemento sobre el que estás pasando el cursor
+## Notes-frFR: Cet addon personnalise l'affichage des info-bulles pour montrer quelle recette utilise l'objet au-dessus duquel vous survolez
+## Notes-koKR: 이 애드온은 마우스를 올린 아이템을 사용하는 조리법을 보여주기 위해 툴팁 표시를 사용자 정의합니다
+## Notes-ptBR: Este addon personaliza a exibição do tooltip para mostrar qual receita usa o item sobre o qual você está passando o cursor
 ## Notes-ruRU: Этот аддон настраивает отображение подсказок, чтобы показать, в каком рецепте используется предмет, на который вы навели курсор
+## Notes-zhCN: 这个插件自定义工具提示显示，显示哪个配方使用您悬停的物品
+## Notes-zhTW: 這個插件自訂工具提示顯示，顯示哪個配方使用您懸停的物品
 ## Author: DaDaemon, Triadian, Refaim
-## Version: 2.4.4
+## Version: 2.5
 ## SavedVariables: MTS_DATA, MasterTradeSkillsData
 
 lib\LibStub\LibStub.lua
@@ -25,10 +32,15 @@ lib\AceConfig-3.0\AceConfig-3.0.xml
 src\Environment.lua
 src\GlobalVariables.lua
 src\Utils.lua
-src\locale\enUS.lua
 src\locale\deDE.lua
+src\locale\enUS.lua
+src\locale\esES.lua
 src\locale\frFR.lua
+src\locale\koKR.lua
+src\locale\ptBR.lua
 src\locale\ruRU.lua
+src\locale\zhCN.lua
+src\locale\zhTW.lua
 src\database\Legacy.lua
 src\database\Modern.lua
 src\Options.lua

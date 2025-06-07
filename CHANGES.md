@@ -1,3 +1,6 @@
+### v2.5 (2025/06/07)
+- Support esES, koKR, ptBR, zhCN and zhTW locales
+
 ### v2.4.4 (2025/06/07)
 - Attempt to fix addon crash when rendering tooltip
 - Attempt to fix tooltip appearing on NPCs and unrelated elements of UI
