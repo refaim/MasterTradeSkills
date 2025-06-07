@@ -3,7 +3,7 @@
 ## Notes: This addon customizes the tooltip display to show which recipe uses the item your hovering above
 ## Notes-ruRU: Этот аддон настраивает отображение подсказок, чтобы показать, в каком рецепте используется предмет, на который вы навели курсор
 ## Author: DaDaemon, Triadian, Refaim
-## Version: 2.4.3
+## Version: 2.4.4
 ## SavedVariables: MTS_DATA, MasterTradeSkillsData
 
 lib\LibStub\LibStub.lua

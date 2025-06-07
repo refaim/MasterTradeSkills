@@ -1,3 +1,7 @@
+### v2.4.4 (2025/06/07)
+- Attempt to fix addon crash when rendering tooltip
+- Attempt to fix tooltip appearing on NPCs and unrelated elements of UI
+
 ### v2.4.3 (2025/06/06)
 - Update tooltip data when levelling up profession and learning new skills
 
