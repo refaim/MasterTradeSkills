@@ -1,3 +1,6 @@
+### v2.5.1 (2025/06/10)
+- Update LibCrafts
+
 ### v2.5 (2025/06/07)
 - Support esES, koKR, ptBR, zhCN and zhTW locales
 
