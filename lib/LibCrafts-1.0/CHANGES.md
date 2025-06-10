@@ -1,3 +1,6 @@
+### Revision 11 (2025/06/11)
+- Fix a lot of database errors
+
 ### Revision 10 (2025/06/10)
 - Fix localized profession names
 

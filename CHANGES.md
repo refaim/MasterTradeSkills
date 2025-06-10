@@ -1,3 +1,6 @@
+### v2.5.3 (2025/06/11)
+- Update LibCrafts to fix a lot of craft database errors
+
 ### v2.5.2 (2025/06/10)
 - Update LibCrafts and LibCraftingProfessions
 

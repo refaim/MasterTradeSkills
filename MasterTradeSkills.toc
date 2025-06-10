@@ -10,7 +10,7 @@
 ## Notes-zhCN: 这个插件自定义工具提示显示，显示哪个配方使用您悬停的物品
 ## Notes-zhTW: 這個插件自訂工具提示顯示，顯示哪個配方使用您懸停的物品
 ## Author: DaDaemon, Triadian, Refaim
-## Version: 2.5.2
+## Version: 2.5.3
 ## SavedVariables: MTS_DATA, MasterTradeSkillsData
 
 lib\LibStub\LibStub.lua
