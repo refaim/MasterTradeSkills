@@ -1,3 +1,6 @@
+### v2.5.2 (2025/06/10)
+- Update LibCrafts and LibCraftingProfessions
+
 ### v2.5.1 (2025/06/10)
 - Update LibCrafts
 

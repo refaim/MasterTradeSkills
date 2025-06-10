@@ -1,3 +1,6 @@
+### Revision 10 (2025/06/10)
+- Fix localized profession names
+
 ### Revision 9 (2025/06/10)
 - Vanilla: Fix a bunch of localization mistakes
 - Turtle: Fully support esES, ptBR and zhCN locales
