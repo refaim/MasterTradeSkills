@@ -4,7 +4,6 @@ local L = --[[---@type MasterTradeSkillsLocale]] MasterTradeSkills_Utils:NewLoca
 if L == nil then return end
 
 L.txt_addon_loaded = "Master Trade Skills v".. MtsAddonVersion .. " 애드온 로드됨"
-L.txt_missing_locale = "Refaim에게 \"%s\"에 대한 로케일이 누락되었음을 알려주세요: https://github.com/refaim/MasterTradeSkills/issues/new"
 L.txt_open_options = "옵션 열기"
 
 L.txt_option_group_enable = "활성화"

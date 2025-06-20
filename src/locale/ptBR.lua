@@ -4,7 +4,6 @@ local L = --[[---@type MasterTradeSkillsLocale]] MasterTradeSkills_Utils:NewLoca
 if L == nil then return end
 
 L.txt_addon_loaded = "Master Trade Skills v".. MtsAddonVersion .. " AddOn carregado"
-L.txt_missing_locale = "Por favor, informe ao Refaim que a localização para \"%s\" está faltando: https://github.com/refaim/MasterTradeSkills/issues/new"
 L.txt_open_options = "Abrir opções"
 
 L.txt_option_group_enable = "Ativar"

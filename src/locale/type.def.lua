@@ -1,6 +1,5 @@
 ---@shape MasterTradeSkillsLocale
 ---@field txt_addon_loaded string
----@field txt_missing_locale string
 ---@field txt_open_options string
 ---@field txt_option_group_enable string
 ---@field txt_option_enhance_tooltips string

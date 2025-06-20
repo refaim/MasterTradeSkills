@@ -3,7 +3,6 @@ setfenv(1, MasterTradeSkills)
 local L = --[[---@type MasterTradeSkillsLocale]] MasterTradeSkills_Utils:NewLocale("enUS", true)
 
 L.txt_addon_loaded = format("Master Trade Skills v%s AddOn loaded", MtsAddonVersion)
-L.txt_missing_locale = "Please inform Refaim that the locale for \"%s\" is missing: https://github.com/refaim/MasterTradeSkills/issues/new"
 L.txt_open_options = "Open options"
 
 L.txt_option_group_enable = "Enable"
