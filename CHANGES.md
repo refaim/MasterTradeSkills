@@ -1,3 +1,6 @@
+### v2.5.4 (2025/06/23)
+- Fix broken TradeSkillFrame filters
+
 ### v2.5.3 (2025/06/11)
 - Update LibCrafts to fix a lot of craft database errors
 

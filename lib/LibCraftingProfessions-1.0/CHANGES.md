@@ -1,3 +1,11 @@
+### Revision 15 (2025/06/13)
+- Fix broken TradeSkillFrame filters
+
+### Revision 14 (2025/06/17)
+- Fix bug with sending false LCP_FRAME_CLOSE events
+- Fix library upgrade code regarding Artisan and ATSW2 support
+- Fix nil instead of CraftFrame/TradeSkilLFrame in LCP_FRAME_SHOW/LCP_FRAME_CLOSE handler arguments
+
 ### Revision 13 (2025/06/10)
 - Fix localized profession names
 
