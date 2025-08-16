@@ -1,3 +1,6 @@
+### v2.5.5 (2025/08/16)
+- Update LibCrafts and LibCraftingProfessions
+
 ### v2.5.4 (2025/06/23)
 - Fix broken TradeSkillFrame filters
 
