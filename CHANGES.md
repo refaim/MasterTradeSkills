@@ -1,3 +1,6 @@
+### v2.5.6 (2025/08/16)
+- Update LibCrafts and LibCraftingProfessions (support latest Turtle localization changes)
+
 ### v2.5.5 (2025/08/16)
 - Update LibCrafts and LibCraftingProfessions
 
