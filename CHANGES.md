@@ -1,3 +1,6 @@
+### v2.5.8 (2025/09/09)
+- Update LibCrafts (add a lot of Turtle recipes, fix data errors)
+
 ### v2.5.7 (2025/09/05)
 - Update LibCrafts and LibCraftingProfessions (support latest Turtle localization changes, add new alchemy recipes)
  
