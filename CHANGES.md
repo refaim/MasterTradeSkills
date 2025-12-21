@@ -1,3 +1,6 @@
+### v2.5.9 (2025/12/21)
+- Update LibCrafts (support latest Turtle localization changes)
+
 ### v2.5.8 (2025/09/09)
 - Update LibCrafts (add a lot of Turtle recipes, fix data errors)
 

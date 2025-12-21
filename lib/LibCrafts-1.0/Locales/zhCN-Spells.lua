@@ -1,5 +1,5 @@
 local lib = LibCraftsGetLibrary()
-local name, locale, version = "Locales-Spells", "zhCN", 9
+local name, locale, version = "Locales-Spells", "zhCN", 10
 local module = --[[---@type LcLocaleModule]] lib:RegisterLocaleModule(name, locale, version)
 if not module then return end
 
@@ -1317,8 +1317,8 @@ if lib.env.is_turtle_wow then
     L["Coarse Gemstone Cluster"] = "粗糙的宝石串"
     L["Coarse Gritted Paper"] = "粗糙砂纸"
     L["Concoction of the Arcane Giant"] = "奥法巨人药剂"
-    L["Concoction of the Dreamwater"] = "梦酊火酒药剂"
-    L["Concoction of the Emerald Mongoose"] = "梦精猫鼬药剂"
+    L["Concoction of the Dreamwater"] = "梦境火酒药剂"
+    L["Concoction of the Emerald Mongoose"] = "翡翠猫鼬药剂"
     L["Copper Bangle"] = "铜手镯"
     L["Copper Belt Buckle"] = "铜带扣"
     L["Copper Knuckles"] = "铜指虎"

@@ -1,5 +1,5 @@
 local lib = LibCraftsGetLibrary()
-local name, locale, version = "Locales-Spells", "ptBR", 9
+local name, locale, version = "Locales-Spells", "ptBR", 10
 local module = --[[---@type LcLocaleModule]] lib:RegisterLocaleModule(name, locale, version)
 if not module then return end
 
@@ -1331,7 +1331,7 @@ if lib.env.is_turtle_wow then
     L["Cosmic Leggings"] = "Perneiras Cósmicas"
     L["Cosmic Mantle"] = "Manto Cósmico"
     L["Cosmic Vest"] = "Colete Cósmico"
-    L["Crawford Apple Tarte"] = "Torta de Maçã Crawford"
+    L["Crawford Apple Tarte"] = "Torta de Maçã Corvineu"
     L["Crown of Elegance"] = "Coroa da Elegância"
     L["Crown of Molten Ascension"] = "Coroa da Ascensão Derretida"
     L["Crown of the Illustrious Queen"] = "Coroa da Ilustre Rainha"
@@ -1717,7 +1717,7 @@ if lib.env.is_turtle_wow then
     L["Specter's Shade Ring"] = "Anel de Sombra do Espectro"
     L["Spellweaver Pendant"] = "Pingente Feiticeiro"
     L["Spellweaver Rod"] = "Bastão de Feiticeiro"
-    L["Spellwoven Nobility Drape"] = "Manto Nobre de Tecido de Feitiços"
+    L["Spellwoven Nobility Drape"] = "Clâmide da Nobreza Tecida com Magia"
     L["Sphinx's Wisdom Staff"] = "Cajado da Sabedoria da Esfinge"
     L["Spire of Channeled Power"] = "Pináculo do Poder Canalizado"
     L["Staff of Blossomed Jade"] = "Cajado de Jade Florescida"

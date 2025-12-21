@@ -1,3 +1,6 @@
+### Revision 14 (2025/12/21)
+- Turtle: Update localization
+
 ### Revision 14 (2025/09/09)
 - Turtle: Add a lot of missing recipes
 - Fix a bunch of data errors
